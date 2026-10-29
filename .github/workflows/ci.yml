@@ -1,0 +1,66 @@
+# Runs on pull requests to main and on manual triggers. Mirrors the other MeshPay
+# mobile SDKs' CI, adapted for Swift Package Manager on macOS: build, unit tests
+# against the shared vectors, SwiftLint, compile the Example app, and assert that
+# VERSION and Version.swift agree.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  checks:
+    runs-on: macos-15
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Show toolchain 🧰
+        run: |
+          swift --version
+          xcodebuild -version
+
+      - name: Assert VERSION matches Version.swift 🏷️
+        run: |
+          VERSION_FILE=$(tr -d '[:space:]' < VERSION)
+          VERSION_SWIFT=$(grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' Sources/MeshpayLink/Version.swift | head -n 1)
+          echo "VERSION=$VERSION_FILE  Version.swift=$VERSION_SWIFT"
+          if [ "$VERSION_FILE" != "$VERSION_SWIFT" ]; then
+            echo "::error::VERSION ($VERSION_FILE) and Version.swift ($VERSION_SWIFT) disagree"
+            exit 1
+          fi
+
+      - name: Build 🔨
+        run: swift build
+
+      - name: Unit tests ✅
+        run: swift test
+
+      - name: Lint 🧹
+        run: |
+          brew list swiftlint >/dev/null 2>&1 || brew install swiftlint
+          swiftlint lint --quiet
+
+      - name: Build Example app 📱
+        run: |
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          cd Example
+          xcodegen generate
+          xcodebuild build \
+            -project MeshpayLinkExample.xcodeproj \
+            -scheme MeshpayLinkExample \
+            -destination 'generic/platform=iOS Simulator'

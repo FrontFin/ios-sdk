@@ -1,0 +1,91 @@
+{
+  "description": "Navigation policy vectors N1–N9 from the MFS SDK solution design (§2.6). Shared across the mobile SDKs; keep in sync. `newWindow: true` means a window.open / target=_blank request.",
+  "linkOrigin": "https://link.meshpay.com",
+  "vectors": [
+    {
+      "id": "N1",
+      "url": "https://link.meshpay.com/deposit",
+      "isTopFrame": true,
+      "expected": { "action": "load" }
+    },
+    {
+      "id": "N2",
+      "url": "https://newassets.hcaptcha.com/captcha/v1",
+      "isTopFrame": false,
+      "expected": { "action": "load" }
+    },
+    {
+      "id": "N3",
+      "url": "https://www.coinbase.com/oauth/authorize",
+      "isTopFrame": true,
+      "expected": { "action": "open-external", "url": "https://www.coinbase.com/oauth/authorize" }
+    },
+    {
+      "id": "N4",
+      "url": "https://www.coinbase.com/onramp",
+      "newWindow": true,
+      "expected": { "action": "open-external", "url": "https://www.coinbase.com/onramp" }
+    },
+    {
+      "id": "N5",
+      "url": "metamask://wc?uri=abc",
+      "isTopFrame": true,
+      "expected": { "action": "open-external", "url": "metamask://wc?uri=abc" }
+    },
+    {
+      "id": "N6",
+      "url": "intent://wc?uri=abc#Intent;scheme=metamask;package=io.metamask;S.browser_fallback_url=https%3A%2F%2Fmetamask.app.link%2Fwc;end",
+      "isTopFrame": true,
+      "expected": {
+        "action": "open-external",
+        "url": "metamask://wc?uri=abc",
+        "fallbackUrl": "https://metamask.app.link/wc"
+      }
+    },
+    {
+      "id": "N7a",
+      "url": "javascript:alert(1)",
+      "isTopFrame": true,
+      "expected": { "action": "block" }
+    },
+    {
+      "id": "N7b",
+      "url": "data:text/html,<p>x</p>",
+      "isTopFrame": false,
+      "expected": { "action": "block" }
+    },
+    {
+      "id": "N7c",
+      "url": "file:///etc/hosts",
+      "isTopFrame": true,
+      "expected": { "action": "block" }
+    },
+    {
+      "id": "N7d",
+      "url": "blob:https://link.meshpay.com/1234",
+      "isTopFrame": true,
+      "expected": { "action": "block" }
+    },
+    {
+      "id": "N7e",
+      "url": "content://contacts/people",
+      "isTopFrame": true,
+      "expected": { "action": "block" }
+    },
+    { "id": "N7f", "url": "about:config", "isTopFrame": true, "expected": { "action": "block" } },
+    { "id": "N7g", "url": "about:blank", "isTopFrame": false, "expected": { "action": "load" } },
+    {
+      "id": "N8",
+      "url": "http://link.meshpay.com/",
+      "isTopFrame": true,
+      "expected": { "action": "block" }
+    },
+    {
+      "id": "N9",
+      "url": "https://abc123.localcan.dev/deposit",
+      "isTopFrame": true,
+      "linkOrigin": "https://abc123.localcan.dev",
+      "expected": { "action": "load" }
+    }
+  ]
+}

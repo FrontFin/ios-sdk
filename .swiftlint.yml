@@ -1,0 +1,28 @@
+included:
+  - Sources
+
+excluded:
+  - .build
+  - Example
+  - Tests
+
+line_length:
+  warning: 140
+  error: 250
+  ignores_comments: true
+  ignores_urls: true
+
+identifier_name:
+  min_length:
+    warning: 1
+  excluded:
+    - id
+    - to
+
+# The WebView host legitimately carries a lot of lifecycle state in one type.
+type_body_length:
+  warning: 400
+  error: 600
+
+disabled_rules:
+  - todo
