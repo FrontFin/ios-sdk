@@ -20,7 +20,7 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             Form {
                 Section("Credentials") {
                     TextField("Client ID", text: $clientId)
@@ -76,6 +76,9 @@ struct ContentView: View {
                 }
             )
         }
+        // Single-column stack on every device (iOS 15's NavigationView otherwise
+        // shows a split layout on iPad).
+        .navigationViewStyle(.stack)
     }
 }
 
