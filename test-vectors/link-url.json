@@ -1,5 +1,5 @@
 {
-  "description": "Link URL vectors U1–U13 from the MFS SDK solution design (§2.4). Shared across the mobile SDKs; keep in sync.",
+  "description": "Link URL vectors U1–U12 from the MFS SDK solution design (§2.4). Shared across the mobile SDKs; keep in sync.",
   "vectors": [
     {
       "id": "U1",
@@ -20,21 +20,12 @@
       "input": {
         "token": "tok_123",
         "clientId": "cid_456",
-        "options": { "environment": "dev", "flow": { "flow": "fiatOnRamp" } }
+        "options": { "environment": "dev" }
       },
-      "expected": "https://link.dev.meshpay.com/?token=tok_123&clientId=cid_456&flow=%7B%22flow%22%3A%22fiatOnRamp%22%7D"
+      "expected": "https://link.dev.meshpay.com/?token=tok_123&clientId=cid_456"
     },
     {
       "id": "U4",
-      "input": {
-        "token": "tok_123",
-        "clientId": "cid_456",
-        "options": { "flow": { "flow": "login", "entry": { "type": "catalog" } } }
-      },
-      "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456&flow=%7B%22flow%22%3A%22login%22%2C%22entry%22%3A%7B%22type%22%3A%22catalog%22%7D%7D"
-    },
-    {
-      "id": "U5",
       "input": {
         "token": "tok_123",
         "clientId": "cid_456",
@@ -43,7 +34,7 @@
       "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456&integrationId=metamask&fiatCur=DKK"
     },
     {
-      "id": "U6",
+      "id": "U5",
       "input": {
         "token": "tok_123",
         "clientId": "cid_456",
@@ -53,7 +44,7 @@
       "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456&th=dark"
     },
     {
-      "id": "U7",
+      "id": "U6",
       "input": {
         "token": "tok_123",
         "clientId": "cid_456",
@@ -62,7 +53,7 @@
       "expected": "https://abc123.localcan.dev/?token=tok_123&clientId=cid_456"
     },
     {
-      "id": "U8",
+      "id": "U7",
       "input": {
         "token": "tok_123",
         "clientId": "cid_456",
@@ -71,7 +62,7 @@
       "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456"
     },
     {
-      "id": "U9",
+      "id": "U8",
       "input": {
         "token": "tok_123",
         "clientId": "cid_456",
@@ -80,7 +71,7 @@
       "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456"
     },
     {
-      "id": "U10",
+      "id": "U9",
       "input": {
         "token": "tok_123",
         "clientId": "cid_456",
@@ -89,17 +80,17 @@
       "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456"
     },
     {
-      "id": "U11",
+      "id": "U10",
       "input": { "token": "tok_123", "clientId": "cid_456", "options": { "linkUrl": "not a url" } },
       "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456"
     },
     {
-      "id": "U12",
+      "id": "U11",
       "input": { "token": "tok_123", "clientId": "  cid_456  ", "options": {} },
       "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456"
     },
     {
-      "id": "U13",
+      "id": "U12",
       "input": { "token": "tok_123", "clientId": "   ", "options": {} },
       "expectedError": true
     }

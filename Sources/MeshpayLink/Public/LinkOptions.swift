@@ -25,9 +25,6 @@ public struct LinkOptions: Sendable, Equatable {
     public var language: String?
     /// `system` is resolved from the device appearance when Link opens.
     public var theme: LinkTheme?
-    /// Which screen Link opens on. Serialised to Link as JSON, never validated
-    /// here.
-    public var flow: LinkFlowConfig?
     /// Pre-select a wallet integration so Link opens straight to its connect
     /// step.
     public var integrationId: String?
@@ -43,7 +40,6 @@ public struct LinkOptions: Sendable, Equatable {
         environment: LinkEnvironment = .prod,
         language: String? = nil,
         theme: LinkTheme? = nil,
-        flow: LinkFlowConfig? = nil,
         integrationId: String? = nil,
         displayFiatCurrency: String? = nil,
         linkUrl: String? = nil
@@ -51,7 +47,6 @@ public struct LinkOptions: Sendable, Equatable {
         self.environment = environment
         self.language = language
         self.theme = theme
-        self.flow = flow
         self.integrationId = integrationId
         self.displayFiatCurrency = displayFiatCurrency
         self.linkUrl = linkUrl

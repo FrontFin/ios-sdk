@@ -1,9 +1,9 @@
 import Foundation
 
 /// Builds the Link UI URL exactly like `buildLinkUrl` in `@meshpayhq/link-web-sdk`:
-/// the parameters `token`, `clientId`, `lng`, `th`, `flow`, `integrationId`,
-/// `fiatCur`, in that order, each only when set, form-encoded. Covered by the
-/// shared URL vectors U1–U13 (solution design §2.4).
+/// the parameters `token`, `clientId`, `lng`, `th`, `integrationId`, `fiatCur`,
+/// in that order, each only when set, form-encoded. Covered by the shared URL
+/// vectors U1–U12 (solution design §2.4).
 enum LinkURLBuilder {
     struct Built: Equatable {
         /// The full URL string to load.
@@ -51,9 +51,6 @@ enum LinkURLBuilder {
         }
         if let theme = options.theme {
             params.append(("th", resolveTheme(theme, isDarkAppearance: isDarkAppearance)))
-        }
-        if let flow = options.flow {
-            params.append(("flow", flow.encodedJSON()))
         }
         if let integrationId = options.integrationId {
             params.append(("integrationId", integrationId))

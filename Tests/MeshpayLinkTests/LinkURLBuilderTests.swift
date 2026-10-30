@@ -25,7 +25,6 @@ struct OptionsJSON: Decodable {
     let environment: String?
     let language: String?
     let theme: String?
-    let flow: LinkFlowConfig?
     let integrationId: String?
     let displayFiatCurrency: String?
     let linkUrl: String?
@@ -35,7 +34,6 @@ struct OptionsJSON: Decodable {
             environment: environment.flatMap(LinkEnvironment.init(rawValue:)) ?? .prod,
             language: language,
             theme: theme.flatMap(LinkTheme.init(rawValue:)),
-            flow: flow,
             integrationId: integrationId,
             displayFiatCurrency: displayFiatCurrency,
             linkUrl: linkUrl
@@ -43,7 +41,7 @@ struct OptionsJSON: Decodable {
     }
 }
 
-@Suite("Link URL — shared vectors (U1–U13)")
+@Suite("Link URL — shared vectors (U1–U12)")
 struct LinkURLVectorTests {
     static let vectors: [URLVector] = {
         let data = try! Vectors.data("link-url.json")

@@ -91,7 +91,6 @@ actor.
 | `environment` | `.prod` / `.sbx` / `.dev` | `.prod` | Which Link deployment to open. |
 | `language` | `String?` | — | UI language, e.g. `"en"` (Link `lng`). |
 | `theme` | `.light` / `.dark` / `.system` | — | `system` follows the device appearance. |
-| `flow` | `LinkFlowConfig?` | Link's start screen | Which screen Link opens on. |
 | `integrationId` | `String?` | — | Pre-select a wallet or exchange. |
 | `displayFiatCurrency` | `String?` | — | ISO 4217 code, e.g. `"DKK"`. A hint; Link validates it. |
 | `linkUrl` | `String?` | — | **Testing only.** Load Link from a LocalCan tunnel (`https://*.localcan.dev`). Any other value is ignored. |
