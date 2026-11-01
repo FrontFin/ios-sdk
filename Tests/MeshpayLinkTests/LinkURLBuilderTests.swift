@@ -60,7 +60,7 @@ struct LinkURLVectorTests {
             )
         }
         if vector.expectedError == true {
-            #expect(throws: LinkConfigurationError.self, "vector \(vector.id)") {
+            #expect(throws: LinkURLBuildError.self, "vector \(vector.id)") {
                 _ = try build()
             }
         } else {
@@ -86,13 +86,13 @@ struct LinkURLBuilderTests {
     }
 
     @Test func rejectsBlankToken() {
-        #expect(throws: LinkConfigurationError.blankToken) {
+        #expect(throws: LinkURLBuildError.blankToken) {
             _ = try LinkURLBuilder.build(token: "  ", clientId: "c", options: LinkOptions(), isDarkAppearance: false)
         }
     }
 
     @Test func rejectsBlankClientId() {
-        #expect(throws: LinkConfigurationError.blankClientId) {
+        #expect(throws: LinkURLBuildError.blankClientId) {
             _ = try LinkURLBuilder.build(token: "t", clientId: "", options: LinkOptions(), isDarkAppearance: false)
         }
     }

@@ -7,7 +7,7 @@ import UIKit
 /// the app), create a `LinkSession`, then present it:
 ///
 /// ```swift
-/// let session = try LinkSession(
+/// let session = LinkSession(
 ///     token: sessionToken,
 ///     clientId: clientId,
 ///     options: LinkOptions(environment: .prod, theme: .system, language: "en"),
@@ -19,6 +19,10 @@ import UIKit
 ///
 /// Exactly one of `onExit` / `onError` is called per session, exactly once, on
 /// the main actor. After it fires the session is finished and cannot reopen.
+///
+/// A blank `token` or `clientId` is **not** an error you have to catch: the
+/// session reports it through `onError` with ``LinkErrorCode/loadError`` when you
+/// present it, and nothing opens.
 @MainActor
 public final class LinkSession {
     private let token: String
@@ -34,26 +38,18 @@ public final class LinkSession {
     ///   - token: Session token from `POST /v2/sessions`, minted by your backend.
     ///   - clientId: Your MeshPay client ID.
     ///   - options: Optional Link settings.
-    /// - Throws: ``LinkConfigurationError/blankToken`` or
-    ///   ``LinkConfigurationError/blankClientId`` when either is empty or
-    ///   whitespace only, so a misconfigured integration fails at call time.
+    ///   - onExit: Called once when the session ends normally.
+    ///   - onError: Called once when Link can't be shown or can't continue —
+    ///     including when `token` or `clientId` is blank (``LinkErrorCode/loadError``).
     public init(
         token: String,
         clientId: String,
         options: LinkOptions = LinkOptions(),
         onExit: @escaping (LinkExitSummary) -> Void,
         onError: @escaping (LinkError) -> Void
-    ) throws {
-        let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedToken.isEmpty else {
-            throw LinkConfigurationError.blankToken
-        }
-        let trimmedClientId = clientId.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedClientId.isEmpty else {
-            throw LinkConfigurationError.blankClientId
-        }
-        self.token = trimmedToken
-        self.clientId = trimmedClientId
+    ) {
+        self.token = token
+        self.clientId = clientId
         self.options = options
         self.onExit = onExit
         self.onError = onError
@@ -61,8 +57,22 @@ public final class LinkSession {
 
     /// Present Link full screen from `presenter`. A no-op once the session has
     /// opened or finished.
+    ///
+    /// A blank `token` or `clientId` (empty or whitespace only) is reported once
+    /// through `onError` with ``LinkErrorCode/loadError`` and nothing opens.
     public func present(from presenter: UIViewController, animated: Bool = true) {
         guard !finished, controller == nil else {
+            return
+        }
+
+        let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedToken.isEmpty else {
+            deliver(.error(LinkError(code: .loadError, message: "token is required.")))
+            return
+        }
+        let trimmedClientId = clientId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedClientId.isEmpty else {
+            deliver(.error(LinkError(code: .loadError, message: "clientId is required.")))
             return
         }
 
@@ -77,12 +87,12 @@ public final class LinkSession {
         }
 
         guard let built = try? LinkURLBuilder.build(
-            token: token,
-            clientId: clientId,
+            token: trimmedToken,
+            clientId: trimmedClientId,
             options: options,
             isDarkAppearance: isDark
         ) else {
-            // Unreachable: token and clientId were validated at init.
+            // Unreachable: the blanks are handled above.
             deliver(.error(LinkError(code: .loadError, message: "The Link URL could not be built.")))
             return
         }

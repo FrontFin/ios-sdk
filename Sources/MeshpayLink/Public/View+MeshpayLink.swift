@@ -81,32 +81,30 @@ private struct MeshpayLinkPresenter: UIViewControllerRepresentable {
         }
 
         private func present(from host: UIViewController) {
-            let session: LinkSession
-            do {
-                session = try LinkSession(
-                    token: parent.token,
-                    clientId: parent.clientId,
-                    options: parent.options,
-                    onExit: { [weak self] summary in
-                        self?.finish()
-                        self?.parent.onExit(summary)
-                    },
-                    onError: { [weak self] error in
-                        self?.finish()
-                        self?.parent.onError(error)
-                    }
-                )
-            } catch {
-                // Blank token/clientId: nothing to present. Reset the binding
-                // asynchronously so it isn't mutated during a view update.
-                DispatchQueue.main.async { [weak self] in
-                    self?.resetBinding()
+            let session = LinkSession(
+                token: parent.token,
+                clientId: parent.clientId,
+                options: parent.options,
+                onExit: { [weak self] summary in
+                    self?.finish()
+                    self?.parent.onExit(summary)
+                },
+                onError: { [weak self] error in
+                    self?.finish()
+                    self?.parent.onError(error)
                 }
-                return
-            }
+            )
             self.session = session
             presenting = true
-            session.present(from: host.topmostPresenter())
+            // Present on the next runloop tick so a synchronous outcome — a blank
+            // token/clientId reported through `onError` — never mutates SwiftUI
+            // state during this view update.
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.session === session else {
+                    return
+                }
+                session.present(from: host.topmostPresenter())
+            }
         }
 
         private func finish() {

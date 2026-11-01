@@ -49,11 +49,3 @@ public struct LinkError: Error, Sendable, Equatable {
         self.message = message
     }
 }
-
-/// Thrown by ``LinkSession/init(token:clientId:options:onExit:onError:)`` when a
-/// required value is blank (empty or whitespace only), so a misconfigured
-/// integration fails at call time instead of opening a broken Link.
-public enum LinkConfigurationError: Error, Sendable, Equatable {
-    case blankToken
-    case blankClientId
-}

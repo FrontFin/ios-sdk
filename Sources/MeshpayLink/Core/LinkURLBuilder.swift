@@ -4,6 +4,15 @@ import Foundation
 /// the parameters `token`, `clientId`, `lng`, `th`, `integrationId`, `fiatCur`,
 /// in that order, each only when set, form-encoded. Covered by the shared URL
 /// vectors U1–U12 (solution design §2.4).
+/// A blank input reaching the pure URL builder. The public surface
+/// (``LinkSession``) rejects blanks before this point and reports them through
+/// `onError`; this error is the builder's own guard and the U12 vector's expected
+/// failure.
+enum LinkURLBuildError: Error, Equatable {
+    case blankToken
+    case blankClientId
+}
+
 enum LinkURLBuilder {
     struct Built: Equatable {
         /// The full URL string to load.
@@ -15,7 +24,7 @@ enum LinkURLBuilder {
 
     /// - Parameter isDarkAppearance: the device appearance, used to resolve a
     ///   `system` theme to `light`/`dark` at open time.
-    /// - Throws: ``LinkConfigurationError`` when `token` or `clientId` is blank.
+    /// - Throws: ``LinkURLBuildError`` when `token` or `clientId` is blank.
     static func build(
         token: String,
         clientId: String,
@@ -24,11 +33,11 @@ enum LinkURLBuilder {
     ) throws -> Built {
         let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedToken.isEmpty else {
-            throw LinkConfigurationError.blankToken
+            throw LinkURLBuildError.blankToken
         }
         let trimmedClientId = clientId.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedClientId.isEmpty else {
-            throw LinkConfigurationError.blankClientId
+            throw LinkURLBuildError.blankClientId
         }
 
         // `linkUrl` (advanced/testing) overrides the environment → URL map, but
