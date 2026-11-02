@@ -81,7 +81,15 @@ enum NavigationPolicy {
     /// `browser_fallback_url`. iOS does not receive `intent:` from WebKit, but
     /// the rule is kept so the shared vector set (N6) passes on every platform.
     private static func intentDecision(url: String) -> NavigationDecision {
-        guard let fragmentRange = url.range(of: "#Intent;") else {
+        // Only a hierarchical `intent://…#Intent;…` URL is handled. A malformed
+        // one like `intent:#Intent;…` (no `//` authority) puts its fragment
+        // before the assumed `intent://` prefix length, which would slice an
+        // invalid range below; reject it up front.
+        let prefix = "intent://"
+        guard url.count >= prefix.count,
+              url.prefix(prefix.count).lowercased() == prefix,
+              let fragmentRange = url.range(of: "#Intent;")
+        else {
             return .block
         }
         let target = String(url[url.index(url.startIndex, offsetBy: "intent://".count)..<fragmentRange.lowerBound])

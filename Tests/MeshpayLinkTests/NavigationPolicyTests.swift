@@ -90,6 +90,18 @@ struct NavigationPolicyExtraTests {
         #expect(NavigationPolicy.decideNavigation(url: "about:srcdoc", isMainFrame: false, linkOrigin: link) == .load)
     }
 
+    @Test func blocksMalformedIntentWithoutAuthority() {
+        // Regression: a non-hierarchical `intent:` URL whose fragment precedes
+        // the assumed `intent://` prefix length must be blocked, not crash.
+        #expect(NavigationPolicy.decideNavigation(url: "intent:#Intent;scheme=metamask;end", isMainFrame: true, linkOrigin: link) == .block)
+        #expect(NavigationPolicy.decideNavigation(url: "intent:#Intent;end", isMainFrame: true, linkOrigin: link) == .block)
+        // A well-formed intent:// with an empty target still resolves safely.
+        #expect(
+            NavigationPolicy.decideNavigation(url: "intent://#Intent;scheme=metamask;end", isMainFrame: true, linkOrigin: link)
+                == .openExternal(url: "metamask://")
+        )
+    }
+
     @Test func decideNewWindowOpensWalletSchemesAndBlocksUnsafeOnes() {
         #expect(NavigationPolicy.decideNewWindow(url: "metamask://wc") == .openExternal(url: "metamask://wc"))
         #expect(NavigationPolicy.decideNewWindow(url: "javascript:alert(1)") == .block)
