@@ -42,7 +42,7 @@ to the SDK together with your client ID.
 ```swift
 import MeshpayLink
 
-let session = try LinkSession(
+let session = LinkSession(
     token: sessionToken,
     clientId: clientId,
     options: LinkOptions(environment: .prod, theme: .system, language: "en"),
@@ -56,7 +56,8 @@ let session = try LinkSession(
 session.present(from: viewController)
 ```
 
-Close it from your app with `session.close()`.
+Storing `session` is optional: Link keeps it alive while it is on screen. Keep a
+reference only if you want to close it from your app with `session.close()`.
 
 ## Usage (SwiftUI)
 

@@ -20,6 +20,9 @@ import UIKit
 /// Exactly one of `onExit` / `onError` is called per session, exactly once, on
 /// the main actor. After it fires the session is finished and cannot reopen.
 ///
+/// You don't need to keep a reference to the session: Link keeps it alive while
+/// it is on screen. Keep one only to call ``close()``.
+///
 /// A blank `token` or `clientId` is **not** an error you have to catch: the
 /// session reports it through `onError` with ``LinkErrorCode/loadError`` when you
 /// present it, and nothing opens.
@@ -97,8 +100,10 @@ public final class LinkSession {
             return
         }
 
-        let controller = LinkViewController(built: built, isDark: isDark) { [weak self] outcome in
-            self?.deliver(outcome)
+        // Captured strongly on purpose: the presented controller keeps the session
+        // alive, so an integrator need not store it. No cycle — `controller` is weak.
+        let controller = LinkViewController(built: built, isDark: isDark) { outcome in
+            self.deliver(outcome)
         }
         controller.modalPresentationStyle = .fullScreen
         controller.modalPresentationCapturesStatusBarAppearance = true
