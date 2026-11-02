@@ -62,11 +62,19 @@ private struct MeshpayLinkPresenter: UIViewControllerRepresentable {
         context.coordinator.sync(isPresented: isPresented, host: host)
     }
 
+    /// The view carrying `.meshpayLink` was removed: no update with
+    /// `isPresented == false` will follow, so end the session here.
+    static func dismantleUIViewController(_ host: UIViewController, coordinator: Coordinator) {
+        coordinator.end()
+    }
+
     @MainActor
     final class Coordinator {
         var parent: MeshpayLinkPresenter
         private var session: LinkSession?
         private var presenting = false
+        /// Created but not yet presented: `present` is deferred a runloop tick.
+        private var pending = false
 
         init(_ parent: MeshpayLinkPresenter) {
             self.parent = parent
@@ -76,26 +84,42 @@ private struct MeshpayLinkPresenter: UIViewControllerRepresentable {
             if isPresented, !presenting {
                 present(from: host)
             } else if !isPresented, presenting {
+                end()
+            }
+        }
+
+        /// Closes the active session, or cancels one still waiting to present
+        /// (`close()` would be a no-op: it has no controller yet).
+        func end() {
+            guard presenting else {
+                return
+            }
+            if pending {
+                cancelPending()
+            } else {
                 session?.close()
             }
         }
 
         private func present(from host: UIViewController) {
+            // The callbacks hold the coordinator strongly so they still reach the
+            // integrator after the view is dismantled; `finish` breaks the cycle.
             let session = LinkSession(
                 token: parent.token,
                 clientId: parent.clientId,
                 options: parent.options,
-                onExit: { [weak self] summary in
-                    self?.finish()
-                    self?.parent.onExit(summary)
+                onExit: { summary in
+                    self.finish()
+                    self.parent.onExit(summary)
                 },
-                onError: { [weak self] error in
-                    self?.finish()
-                    self?.parent.onError(error)
+                onError: { error in
+                    self.finish()
+                    self.parent.onError(error)
                 }
             )
             self.session = session
             presenting = true
+            pending = true
             // Present on the next runloop tick so a synchronous outcome — a blank
             // token/clientId reported through `onError` — never mutates SwiftUI
             // state during this view update.
@@ -103,14 +127,35 @@ private struct MeshpayLinkPresenter: UIViewControllerRepresentable {
                 guard let self, self.session === session else {
                     return
                 }
+                guard self.parent.isPresented else {
+                    self.cancelPending()
+                    return
+                }
+                self.pending = false
                 session.present(from: host.topmostPresenter())
             }
         }
 
+        /// Drops a session that never opened and reports it as canceled, so the
+        /// integrator still gets exactly one outcome. Deferred, because this can
+        /// run during a SwiftUI view update.
+        private func cancelPending() {
+            clear()
+            DispatchQueue.main.async {
+                self.resetBinding()
+                self.parent.onExit(LinkExitSummary(status: .canceled))
+            }
+        }
+
         private func finish() {
-            presenting = false
-            session = nil
+            clear()
             resetBinding()
+        }
+
+        private func clear() {
+            presenting = false
+            pending = false
+            session = nil
         }
 
         private func resetBinding() {
