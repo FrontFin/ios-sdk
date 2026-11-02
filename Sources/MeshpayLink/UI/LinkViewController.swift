@@ -299,6 +299,25 @@ extension LinkViewController: WKNavigationDelegate {
         }
     }
 
+    /// An HTTP error on the main document is a completed navigation to WebKit,
+    /// not a `didFail`, so it would otherwise end the load guard and show an
+    /// error page. Treat it as a load failure, matching `onHttpError` on React
+    /// Native. Cancelling surfaces as a policy-change error, which
+    /// `isCancellation` ignores.
+    func webView(
+        _ webView: WKWebView,
+        decidePolicyFor navigationResponse: WKNavigationResponse
+    ) async -> WKNavigationResponsePolicy {
+        guard navigationResponse.isForMainFrame,
+              let response = navigationResponse.response as? HTTPURLResponse,
+              response.statusCode >= 400
+        else {
+            return .allow
+        }
+        handleLoadFailure()
+        return .cancel
+    }
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         // A new top-frame navigation replaces any failed document.
         navigationFailed = false
