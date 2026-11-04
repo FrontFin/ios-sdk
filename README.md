@@ -96,8 +96,10 @@ actor.
 | `displayFiatCurrency` | `String?` | — | ISO 4217 code, e.g. `"DKK"`. A hint; Link validates it. |
 | `linkUrl` | `String?` | — | **Testing only.** Load Link from a LocalCan tunnel (`https://*.localcan.dev`). Any other value is ignored. |
 
-A blank `token` or `clientId` throws ``LinkConfigurationError`` from the
-`LinkSession` initializer, so a misconfigured integration fails at call time.
+A blank (empty or whitespace-only) `token` or `clientId` does not throw: when you
+call `present`, the session ends at once with `onError` and code `.loadError`
+(message `"token is required."` or `"clientId is required."`), and Link is not
+shown.
 
 ## Session status
 
@@ -111,7 +113,7 @@ confirm the outcome server-side.
 
 | `error.code` | Meaning |
 | --- | --- |
-| `.loadError` | The Link page failed to load. |
+| `.loadError` | The Link page failed to load, Link could not be presented, or `token` / `clientId` is blank. |
 | `.loadTimeout` | The Link page did not load within 15 s. |
 | `.sessionInterrupted` | The WebView's content process stopped and the session cannot resume. |
 
