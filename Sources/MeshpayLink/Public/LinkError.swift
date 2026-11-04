@@ -25,16 +25,30 @@ public struct LinkExitSummary: Sendable, Equatable {
 }
 
 /// Why Link could not be shown or could not continue.
-public enum LinkErrorCode: String, Sendable, Equatable {
+///
+/// An open set: new codes can be added in minor versions, so a `switch` over a
+/// code needs a `default` branch. `rawValue` is the wire string shared with the
+/// other MeshPay SDKs (e.g. `"load-error"`).
+public struct LinkErrorCode: RawRepresentable, Hashable, Sendable, CustomStringConvertible {
+    public let rawValue: String
+
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+
+    public var description: String {
+        rawValue
+    }
+
     /// The Link page failed to load (a network failure or an HTTP error on the
     /// page itself).
-    case loadError = "load-error"
-    /// The Link page did not finish loading within ``Constants/loadTimeout``
-    /// (15 s). A page that loads but never posts `loaded` is not covered.
-    case loadTimeout = "load-timeout"
+    public static let loadError = LinkErrorCode(rawValue: "load-error")
+    /// The Link page did not finish loading within 15 s. A page that loads but
+    /// never posts `loaded` is not covered.
+    public static let loadTimeout = LinkErrorCode(rawValue: "load-timeout")
     /// The WebView's content process died mid-session and the session cannot
     /// resume.
-    case sessionInterrupted = "session-interrupted"
+    public static let sessionInterrupted = LinkErrorCode(rawValue: "session-interrupted")
 }
 
 /// Reported via `onError` when Link can't be shown or can't continue.

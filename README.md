@@ -127,6 +127,19 @@ example, its script fails) does not report an error; the native close button
 appears instead, and closing it ends the session with `onExit` and status
 `canceled`.
 
+New error codes can be added in minor versions, so handle unknown ones:
+
+```swift
+switch error.code {
+case .loadError, .loadTimeout:
+    showRetry()
+case .sessionInterrupted:
+    showRestart()
+default:
+    showGenericError(error.code.rawValue)
+}
+```
+
 ## Wallet apps
 
 Wallet deep links and external pages (OAuth, on-ramps) open in the wallet app or
