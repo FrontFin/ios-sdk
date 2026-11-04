@@ -56,7 +56,10 @@ struct LinkURLVectorTests {
                 token: vector.input.token,
                 clientId: vector.input.clientId,
                 options: vector.input.options.toOptions(),
-                isDarkAppearance: isDark
+                isDarkAppearance: isDark,
+                // The shared vectors describe a debug build (tunnel allowed),
+                // whatever configuration the tests are built in.
+                allowTunnel: true
             )
         }
         if vector.expectedError == true {
@@ -80,7 +83,8 @@ struct LinkURLBuilderTests {
             token: "t",
             clientId: "c",
             options: LinkOptions(linkUrl: "https://abc123.localcan.dev:8443/app"),
-            isDarkAppearance: false
+            isDarkAppearance: false,
+            allowTunnel: true
         )
         #expect(tunnel.origin == "https://abc123.localcan.dev:8443")
     }
@@ -112,7 +116,8 @@ struct LinkURLBuilderTests {
             token: "t",
             clientId: "c",
             options: LinkOptions(linkUrl: "https://abc123.localcan.dev/app?x=1#top"),
-            isDarkAppearance: false
+            isDarkAppearance: false,
+            allowTunnel: true
         )
         #expect(built.href == "https://abc123.localcan.dev/app?x=1&token=t&clientId=c#top")
     }
