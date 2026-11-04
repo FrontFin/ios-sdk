@@ -43,10 +43,6 @@ final class LinkViewController: UIViewController {
         fatalError("init(coder:) is not supported")
     }
 
-    // No `deinit` cleanup is needed: `WeakScriptMessageHandler` keeps the content
-    // controller from retaining this view controller, so there is no cycle to
-    // break, and `finish` removes the handler and clears the delegates anyway.
-
     override var preferredStatusBarStyle: UIStatusBarStyle {
         isDark ? .lightContent : .darkContent
     }
@@ -77,6 +73,30 @@ final class LinkViewController: UIViewController {
         startLoadTimer()
         startCloseButtonTimer()
         webView.load(URLRequest(url: url))
+    }
+
+    /// The host dismissed Link, or something below it (logout swapping the UI, a
+    /// deep link resetting it, the sheet holding `.meshpayLink` closing), without
+    /// going through ``finish(_:)``. End the session so exactly one outcome is
+    /// still delivered and the single-use token can't be presented again.
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        guard !done else {
+            return
+        }
+        if isBeingDismissed || presentingViewController == nil {
+            finish(.exit(.canceled))
+            return
+        }
+        // Still presented: Link is covered by something full screen (a camera
+        // picker, a host screen). A dismissal lower in the stack may not flag this
+        // controller as being dismissed, so re-check once UIKit has settled.
+        // `self` is captured strongly so the controller survives until then.
+        DispatchQueue.main.async { [self] in
+            if !done, presentingViewController == nil {
+                finish(.exit(.canceled))
+            }
+        }
     }
 
     // MARK: - WebView

@@ -59,6 +59,10 @@ session.present(from: viewController)
 Storing `session` is optional: Link keeps it alive while it is on screen. Keep a
 reference only if you want to close it from your app with `session.close()`.
 
+If your app dismisses Link itself, or a screen below it (for example on logout),
+the session ends with `onExit` and status `canceled`. A session is presented at
+most once; create a new one, with a new token, to open Link again.
+
 ## Usage (SwiftUI)
 
 ```swift

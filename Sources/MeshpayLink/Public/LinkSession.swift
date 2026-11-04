@@ -36,6 +36,9 @@ public final class LinkSession {
 
     private weak var controller: LinkViewController?
     private var finished = false
+    /// Set once Link is handed to UIKit. `controller` is weak, so it alone can't
+    /// stop a second `present` from reusing the single-use token.
+    private var started = false
 
     /// - Parameters:
     ///   - token: Session token from `POST /v2/sessions`, minted by your backend.
@@ -59,12 +62,12 @@ public final class LinkSession {
     }
 
     /// Present Link full screen from `presenter`. A no-op once the session has
-    /// opened or finished.
+    /// opened or finished; a session is presented at most once.
     ///
     /// A blank `token` or `clientId` (empty or whitespace only) is reported once
     /// through `onError` with ``LinkErrorCode/loadError`` and nothing opens.
     public func present(from presenter: UIViewController, animated: Bool = true) {
-        guard !finished, controller == nil else {
+        guard !finished, !started else {
             return
         }
 
@@ -119,6 +122,7 @@ public final class LinkSession {
         controller.modalPresentationStyle = .fullScreen
         controller.modalPresentationCapturesStatusBarAppearance = true
         self.controller = controller
+        started = true
         target.present(controller, animated: animated)
 
         // `presentingViewController` is set synchronously on a successful present;
@@ -143,7 +147,9 @@ public final class LinkSession {
         finished = true
         let presented = controller
         controller = nil
-        if let presented {
+        // Skip when the host is already dismissing Link (it reported through
+        // `viewDidDisappear`): a second dismiss mid-transition only adds warnings.
+        if let presented, !presented.isBeingDismissed, presented.presentingViewController != nil {
             // Dismiss from Link's presenter: on Link itself, `dismiss` only closes
             // whatever Link is presenting (a host alert, a file or camera picker)
             // and leaves Link on screen. From the presenter, it removes Link and
