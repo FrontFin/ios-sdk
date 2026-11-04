@@ -143,7 +143,18 @@ public final class LinkSession {
         finished = true
         let presented = controller
         controller = nil
-        presented?.dismiss(animated: true)
+        if let presented {
+            // Dismiss from Link's presenter: on Link itself, `dismiss` only closes
+            // whatever Link is presenting (a host alert, a file or camera picker)
+            // and leaves Link on screen. From the presenter, it removes Link and
+            // everything above it.
+            if let presenter = presented.presentingViewController,
+               presenter.presentedViewController === presented {
+                presenter.dismiss(animated: true)
+            } else {
+                presented.dismiss(animated: true)
+            }
+        }
         switch outcome {
         case let .exit(status):
             onExit(LinkExitSummary(status: status))
