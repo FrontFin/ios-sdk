@@ -29,7 +29,8 @@ public enum LinkErrorCode: String, Sendable, Equatable {
     /// The Link page failed to load (a network failure or an HTTP error on the
     /// page itself).
     case loadError = "load-error"
-    /// The Link page did not load within ``Constants/loadTimeout`` (15 s).
+    /// The Link page did not finish loading within ``Constants/loadTimeout``
+    /// (15 s). A page that loads but never posts `loaded` is not covered.
     case loadTimeout = "load-timeout"
     /// The WebView's content process died mid-session and the session cannot
     /// resume.

@@ -118,8 +118,14 @@ confirm the outcome server-side.
 | `error.code` | Meaning |
 | --- | --- |
 | `.loadError` | The Link page failed to load, Link could not be presented, or `token` / `clientId` is blank. |
-| `.loadTimeout` | The Link page did not load within 15 s. |
+| `.loadTimeout` | The Link page did not finish loading within 15 s. |
 | `.sessionInterrupted` | The WebView's content process stopped and the session cannot resume. |
+
+`.loadTimeout` covers loading the Link page itself: it fires only if the page has
+not finished loading after 15 s. A page that loads but never starts Link (for
+example, its script fails) does not report an error; the native close button
+appears instead, and closing it ends the session with `onExit` and status
+`canceled`.
 
 ## Wallet apps
 
