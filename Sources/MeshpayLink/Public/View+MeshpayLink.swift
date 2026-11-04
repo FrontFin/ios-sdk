@@ -165,16 +165,4 @@ private struct MeshpayLinkPresenter: UIViewControllerRepresentable {
         }
     }
 }
-
-private extension UIViewController {
-    /// The view controller actually on screen above `self`, so Link presents
-    /// over any sheet the host has already put up.
-    func topmostPresenter() -> UIViewController {
-        var presenter: UIViewController = self
-        while let presented = presenter.presentedViewController {
-            presenter = presented
-        }
-        return presenter
-    }
-}
 #endif

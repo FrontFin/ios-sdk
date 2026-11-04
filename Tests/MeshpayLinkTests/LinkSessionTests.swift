@@ -30,5 +30,15 @@ struct LinkSessionTests {
         _ = LinkSession(token: " t ", clientId: " c ", onExit: { _ in }, onError: { _ in errored = true })
         #expect(!errored)
     }
+
+    @Test func reportsLoadErrorWhenPresenterCannotPresent() {
+        // A presenter that is not in a window can't present; the session must
+        // still deliver exactly one outcome rather than silently doing nothing.
+        var captured: LinkError?
+        let session = LinkSession(token: "t", clientId: "c", onExit: { _ in }, onError: { captured = $0 })
+        session.present(from: UIViewController())
+        #expect(captured?.code == .loadError)
+        #expect(captured?.message == "Link could not be presented.")
+    }
 }
 #endif

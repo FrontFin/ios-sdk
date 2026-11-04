@@ -100,6 +100,17 @@ public final class LinkSession {
             return
         }
 
+        // Present over whatever is already on screen; presenting straight from
+        // `presenter` would be a silent no-op if it is already presenting.
+        let target = presenter.topmostPresenter()
+        // A presenter that isn't in a window can't present. Without this, `present`
+        // is a no-op, UIKit never retains the controller (``controller`` is weak),
+        // and neither callback would ever fire — so report it instead.
+        guard target.viewIfLoaded?.window != nil else {
+            deliver(.error(LinkError(code: .loadError, message: "Link could not be presented.")))
+            return
+        }
+
         // Captured strongly on purpose: the presented controller keeps the session
         // alive, so an integrator need not store it. No cycle — `controller` is weak.
         let controller = LinkViewController(built: built, isDark: isDark) { outcome in
@@ -108,7 +119,14 @@ public final class LinkSession {
         controller.modalPresentationStyle = .fullScreen
         controller.modalPresentationCapturesStatusBarAppearance = true
         self.controller = controller
-        presenter.present(controller, animated: animated)
+        target.present(controller, animated: animated)
+
+        // `presentingViewController` is set synchronously on a successful present;
+        // if it is still nil the presentation was dropped (e.g. mid-transition), so
+        // guarantee the single outcome rather than leaving the session wedged.
+        if controller.presentingViewController == nil {
+            deliver(.error(LinkError(code: .loadError, message: "Link could not be presented.")))
+        }
     }
 
     /// Close the active session: asks Link to close gracefully, waits up to one
