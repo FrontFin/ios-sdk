@@ -117,6 +117,18 @@ struct LinkURLBuilderTests {
         #expect(built.href == "https://abc123.localcan.dev/app?x=1&token=t&clientId=c#top")
     }
 
+    @Test func ignoresTunnelInReleaseBuilds() throws {
+        let built = try LinkURLBuilder.build(
+            token: "t",
+            clientId: "c",
+            options: LinkOptions(environment: .dev, linkUrl: "https://abc123.localcan.dev/app"),
+            isDarkAppearance: false,
+            allowTunnel: false
+        )
+        #expect(built.href == "https://link.dev.meshpay.com/?token=t&clientId=c")
+        #expect(built.origin == "https://link.dev.meshpay.com")
+    }
+
     @Test func resolvesTheme() {
         #expect(LinkURLBuilder.resolveTheme(.light, isDarkAppearance: true) == "light")
         #expect(LinkURLBuilder.resolveTheme(.dark, isDarkAppearance: false) == "dark")

@@ -31,9 +31,9 @@ public struct LinkOptions: Sendable, Equatable {
     /// ISO 4217 code (e.g. `"DKK"`) for the currency Link shows and quotes
     /// amounts in. A hint; Link validates it.
     public var displayFiatCurrency: String?
-    /// Advanced / testing only: load Link from a LocalCan tunnel
-    /// (`https://*.localcan.dev`). Any other value is ignored in favour of the
-    /// environment default. Never wire this to untrusted input.
+    /// Testing only: load Link from a LocalCan tunnel (`https://*.localcan.dev`).
+    /// Honoured only in debug builds; release builds, and any other value, use
+    /// the environment default. Never wire this to untrusted input.
     public var linkUrl: String?
 
     public init(

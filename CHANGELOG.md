@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - `LinkSession` that opens the hosted MeshPay Link UI full screen in a `WKWebView`, with `onExit(LinkExitSummary)` and `onError(LinkError)` callbacks and exactly one outcome per session
 - SwiftUI `.meshpayLink(isPresented:token:clientId:options:onExit:onError:)` view modifier
-- `LinkOptions` for environment, language, theme, start screen (`flow`), pre-selected integration, display fiat currency and LocalCan testing URLs
+- `LinkOptions` for environment, language, theme, start screen (`flow`), pre-selected integration, display fiat currency and LocalCan testing URLs (debug builds only)
 - `LinkFlowConfig` mirroring the web SDK's `flow` shapes (`login`, `enter-amount`, `fiatOnRamp`, `fiatOffRamp`)
 - Host-initiated close through `LinkSession.close()`, reporting the status Link returns
 - Navigation policy that opens wallet deep links and external pages (OAuth, on-ramps) in the wallet app or browser and blocks unsafe schemes

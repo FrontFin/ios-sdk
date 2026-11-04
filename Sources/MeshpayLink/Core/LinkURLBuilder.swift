@@ -22,14 +22,29 @@ enum LinkURLBuilder {
         let origin: String
     }
 
-    /// - Parameter isDarkAppearance: the device appearance, used to resolve a
-    ///   `system` theme to `light`/`dark` at open time.
+    /// Whether this build may load Link from a LocalCan tunnel. Compiled out of
+    /// release builds: the SDK ships as source, so `DEBUG` follows the app's own
+    /// build configuration.
+    static var tunnelOverrideAllowed: Bool {
+        #if DEBUG
+        return true
+        #else
+        return false
+        #endif
+    }
+
+    /// - Parameters:
+    ///   - isDarkAppearance: the device appearance, used to resolve a `system`
+    ///     theme to `light`/`dark` at open time.
+    ///   - allowTunnel: whether `linkUrl` may be honoured at all. Defaults to
+    ///     ``tunnelOverrideAllowed``; injectable so tests can cover release builds.
     /// - Throws: ``LinkURLBuildError`` when `token` or `clientId` is blank.
     static func build(
         token: String,
         clientId: String,
         options: LinkOptions,
-        isDarkAppearance: Bool
+        isDarkAppearance: Bool,
+        allowTunnel: Bool = tunnelOverrideAllowed
     ) throws -> Built {
         let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedToken.isEmpty else {
@@ -40,12 +55,13 @@ enum LinkURLBuilder {
             throw LinkURLBuildError.blankClientId
         }
 
-        // `linkUrl` (advanced/testing) overrides the environment → URL map, but
-        // ONLY for a LocalCan tunnel (https://*.localcan.dev). Anything else is
-        // ignored in favour of the environment default, so a stray or untrusted
-        // value can never redirect Link to an arbitrary origin.
+        // `linkUrl` (testing only) overrides the environment → URL map, but ONLY
+        // in debug builds and only for a LocalCan tunnel (https://*.localcan.dev).
+        // Anyone can register a tunnel subdomain, and the tunnel receives the
+        // token and becomes the trusted bridge origin, so release builds always
+        // fall back to the environment default (SR-9).
         let base: String
-        if let linkUrl = options.linkUrl, URLOrigin.isLocalCanTunnel(linkUrl) {
+        if allowTunnel, let linkUrl = options.linkUrl, URLOrigin.isLocalCanTunnel(linkUrl) {
             base = linkUrl
         } else {
             base = Constants.linkURLs[options.environment] ?? Constants.linkURLs[.prod]!
