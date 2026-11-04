@@ -10,9 +10,25 @@ import Foundation
 ///
 /// Use it to drive your UI, never as proof of payment — confirm the outcome
 /// server-side.
-public enum LinkExitStatus: String, Sendable, Equatable {
-    case success
-    case canceled
+///
+/// An open set: new statuses can be added in minor versions, so a `switch` over
+/// a status needs a `default` branch. Today the SDK reports only `success` and
+/// `canceled`; any other status Link sends is reported as `canceled`.
+public struct LinkExitStatus: RawRepresentable, Hashable, Sendable, CustomStringConvertible {
+    public let rawValue: String
+
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+
+    public var description: String {
+        rawValue
+    }
+
+    /// The user completed the target action.
+    public static let success = LinkExitStatus(rawValue: "success")
+    /// Anything else, including a session that ended without a status.
+    public static let canceled = LinkExitStatus(rawValue: "canceled")
 }
 
 /// Passed to `onExit` when the session ends normally.

@@ -113,6 +113,9 @@ created a fiat ramp transfer). Anything else — including a session that ends w
 no status — is `canceled`. Use it to drive your UI, **never as proof of payment**:
 confirm the outcome server-side.
 
+New statuses can be added in minor versions, so a `switch` over
+`summary.status` needs a `default` branch.
+
 ## Errors
 
 | `error.code` | Meaning |
