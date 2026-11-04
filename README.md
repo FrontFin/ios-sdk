@@ -173,8 +173,9 @@ The SDK version lives in both [`VERSION`](VERSION) and
 [`Sources/MeshpayLink/Version.swift`](Sources/MeshpayLink/Version.swift); CI fails
 when they disagree. Bump both with the `bump-version` skill
 ([`.claude/commands/bump-version.md`](.claude/commands/bump-version.md)). SPM
-resolves git tags, so the GitHub Release (tag `X.Y.Z`) is the publication — there
-is no separate publish step.
+resolves git tags, so the GitHub Release (tag `X.Y.Z`) is the publication. There is
+no release workflow yet: after the version-bump PR merges, push tag `X.Y.Z` on
+`main` and create the GitHub Release by hand.
 
 ## License
 
