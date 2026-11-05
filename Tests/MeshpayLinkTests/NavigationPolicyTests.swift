@@ -102,6 +102,19 @@ struct NavigationPolicyExtraTests {
         )
     }
 
+    @Test func blocksNonASCIISchemes() {
+        // A Cyrillic look-alike of `metamask:` is not a scheme, so it is blocked
+        // rather than handed to the OS.
+        let lookalike = "m\u{435}tamask://wc?uri=1"
+        #expect(NavigationPolicy.decideNavigation(url: lookalike, isMainFrame: true, linkOrigin: link) == .block)
+        #expect(NavigationPolicy.decideNewWindow(url: lookalike) == .block)
+        // The same through an Android intent's `scheme=` field: not launchable.
+        #expect(
+            NavigationPolicy.decideNavigation(url: "intent://wc#Intent;scheme=m\u{E9}tamask;end", isMainFrame: true, linkOrigin: link)
+                == .block
+        )
+    }
+
     @Test func decideNewWindowOpensWalletSchemesAndBlocksUnsafeOnes() {
         #expect(NavigationPolicy.decideNewWindow(url: "metamask://wc") == .openExternal(url: "metamask://wc"))
         #expect(NavigationPolicy.decideNewWindow(url: "javascript:alert(1)") == .block)

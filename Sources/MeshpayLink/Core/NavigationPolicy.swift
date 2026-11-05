@@ -115,11 +115,8 @@ enum NavigationPolicy {
     }
 
     private static func isLaunchableScheme(_ scheme: String) -> Bool {
-        guard let first = scheme.first, first.isLetter else {
-            return false
-        }
-        let valid = scheme.allSatisfy { $0.isLetter || $0.isNumber || $0 == "+" || $0 == "." || $0 == "-" }
-        return valid && !blockedSchemes.contains(scheme) && scheme != "intent" && scheme != "about"
+        URLOrigin.isValidScheme(scheme)
+            && !blockedSchemes.contains(scheme) && scheme != "intent" && scheme != "about"
     }
 
     private static func decodeFallback(_ value: String?) -> String? {

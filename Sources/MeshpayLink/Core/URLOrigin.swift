@@ -50,7 +50,7 @@ enum URLOrigin {
         }
         if parts.count == 2 {
             let port = String(parts[1])
-            guard !port.isEmpty, port.allSatisfy(\.isNumber), port.count <= 5 else {
+            guard !port.isEmpty, port.unicodeScalars.allSatisfy(isASCIIDigit), port.count <= 5 else {
                 return nil
             }
             if port != defaultPorts[scheme] {
@@ -70,14 +70,31 @@ enum URLOrigin {
         return host.hasSuffix(".localcan.dev")
     }
 
-    private static func isValidScheme(_ scheme: String) -> Bool {
-        guard let first = scheme.first, first.isLetter else {
+    // The character checks below are ASCII-only, matching the shared regexes
+    // (`[a-z][a-z0-9+.-]*`, `[a-z0-9.-]+`, `\d{1,5}`). Swift's `isLetter` and
+    // `isNumber` are Unicode-aware and would also accept `é`, Cyrillic look-alikes
+    // or Arabic-Indic digits, which the other SDKs reject.
+
+    /// True for an RFC 3986 scheme: an ASCII letter, then ASCII letters, digits,
+    /// `+`, `.` or `-`.
+    static func isValidScheme(_ scheme: String) -> Bool {
+        guard let first = scheme.unicodeScalars.first, isASCIILetter(first) else {
             return false
         }
-        return scheme.allSatisfy { $0.isLetter || $0.isNumber || $0 == "+" || $0 == "." || $0 == "-" }
+        return scheme.unicodeScalars.allSatisfy {
+            isASCIILetter($0) || isASCIIDigit($0) || $0 == "+" || $0 == "." || $0 == "-"
+        }
     }
 
     private static func isValidHost(_ host: String) -> Bool {
-        host.allSatisfy { $0.isLetter || $0.isNumber || $0 == "." || $0 == "-" }
+        host.unicodeScalars.allSatisfy { isASCIILetter($0) || isASCIIDigit($0) || $0 == "." || $0 == "-" }
+    }
+
+    private static func isASCIILetter(_ scalar: Unicode.Scalar) -> Bool {
+        ("a"..."z").contains(scalar) || ("A"..."Z").contains(scalar)
+    }
+
+    private static func isASCIIDigit(_ scalar: Unicode.Scalar) -> Bool {
+        ("0"..."9").contains(scalar)
     }
 }
