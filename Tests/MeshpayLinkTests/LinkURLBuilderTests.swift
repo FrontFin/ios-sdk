@@ -27,7 +27,6 @@ struct OptionsJSON: Decodable {
     let theme: String?
     let integrationId: String?
     let displayFiatCurrency: String?
-    let linkUrl: String?
 
     func toOptions() -> LinkOptions {
         LinkOptions(
@@ -35,13 +34,12 @@ struct OptionsJSON: Decodable {
             language: language,
             theme: theme.flatMap(LinkTheme.init(rawValue:)),
             integrationId: integrationId,
-            displayFiatCurrency: displayFiatCurrency,
-            linkUrl: linkUrl
+            displayFiatCurrency: displayFiatCurrency
         )
     }
 }
 
-@Suite("Link URL — shared vectors (U1–U12)")
+@Suite("Link URL — shared vectors")
 struct LinkURLVectorTests {
     static let vectors: [URLVector] = {
         let data = try! Vectors.data("link-url.json")
@@ -56,10 +54,7 @@ struct LinkURLVectorTests {
                 token: vector.input.token,
                 clientId: vector.input.clientId,
                 options: vector.input.options.toOptions(),
-                isDarkAppearance: isDark,
-                // The shared vectors describe a debug build (tunnel allowed),
-                // whatever configuration the tests are built in.
-                allowTunnel: true
+                isDarkAppearance: isDark
             )
         }
         if vector.expectedError == true {
@@ -75,18 +70,9 @@ struct LinkURLVectorTests {
 
 @Suite("Link URL — builder")
 struct LinkURLBuilderTests {
-    @Test func reportsOriginForEnvironmentAndTunnel() throws {
+    @Test func reportsOriginForEnvironment() throws {
         let sbx = try LinkURLBuilder.build(token: "t", clientId: "c", options: LinkOptions(environment: .sbx), isDarkAppearance: false)
         #expect(sbx.origin == "https://link.sbx.meshpay.com")
-
-        let tunnel = try LinkURLBuilder.build(
-            token: "t",
-            clientId: "c",
-            options: LinkOptions(linkUrl: "https://abc123.localcan.dev:8443/app"),
-            isDarkAppearance: false,
-            allowTunnel: true
-        )
-        #expect(tunnel.origin == "https://abc123.localcan.dev:8443")
     }
 
     @Test func rejectsBlankToken() {
@@ -109,29 +95,6 @@ struct LinkURLBuilderTests {
             isDarkAppearance: false
         )
         #expect(built.href == "https://link.meshpay.com/?token=a+b%21%27%28%29%7E*&clientId=c%26d%3De&lng=pt-BR")
-    }
-
-    @Test func appendsToTunnelWithPathQueryAndHash() throws {
-        let built = try LinkURLBuilder.build(
-            token: "t",
-            clientId: "c",
-            options: LinkOptions(linkUrl: "https://abc123.localcan.dev/app?x=1#top"),
-            isDarkAppearance: false,
-            allowTunnel: true
-        )
-        #expect(built.href == "https://abc123.localcan.dev/app?x=1&token=t&clientId=c#top")
-    }
-
-    @Test func ignoresTunnelInReleaseBuilds() throws {
-        let built = try LinkURLBuilder.build(
-            token: "t",
-            clientId: "c",
-            options: LinkOptions(environment: .dev, linkUrl: "https://abc123.localcan.dev/app"),
-            isDarkAppearance: false,
-            allowTunnel: false
-        )
-        #expect(built.href == "https://link.dev.meshpay.com/?token=t&clientId=c")
-        #expect(built.origin == "https://link.dev.meshpay.com")
     }
 
     @Test func resolvesTheme() {

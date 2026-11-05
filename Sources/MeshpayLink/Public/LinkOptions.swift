@@ -31,24 +31,18 @@ public struct LinkOptions: Sendable, Equatable {
     /// ISO 4217 code (e.g. `"DKK"`) for the currency Link shows and quotes
     /// amounts in. A hint; Link validates it.
     public var displayFiatCurrency: String?
-    /// Testing only: load Link from a LocalCan tunnel (`https://*.localcan.dev`).
-    /// Honoured only in debug builds; release builds, and any other value, use
-    /// the environment default. Never wire this to untrusted input.
-    public var linkUrl: String?
 
     public init(
         environment: LinkEnvironment = .prod,
         language: String? = nil,
         theme: LinkTheme? = nil,
         integrationId: String? = nil,
-        displayFiatCurrency: String? = nil,
-        linkUrl: String? = nil
+        displayFiatCurrency: String? = nil
     ) {
         self.environment = environment
         self.language = language
         self.theme = theme
         self.integrationId = integrationId
         self.displayFiatCurrency = displayFiatCurrency
-        self.linkUrl = linkUrl
     }
 }

@@ -60,16 +60,6 @@ enum URLOrigin {
         return "\(scheme)://\(host)"
     }
 
-    /// True only for an `https://*.localcan.dev` tunnel URL. Subdomains only: the
-    /// apex `localcan.dev` is the vendor site, not a tunnel.
-    static func isLocalCanTunnel(_ value: String) -> Bool {
-        guard let origin = origin(of: value), origin.hasPrefix("https://") else {
-            return false
-        }
-        let host = origin.dropFirst("https://".count).prefix { $0 != ":" }
-        return host.hasSuffix(".localcan.dev")
-    }
-
     // The character checks below are ASCII-only, matching the shared regexes
     // (`[a-z][a-z0-9+.-]*`, `[a-z0-9.-]+`, `\d{1,5}`). Swift's `isLetter` and
     // `isNumber` are Unicode-aware and would also accept `é`, Cyrillic look-alikes

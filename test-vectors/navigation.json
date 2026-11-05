@@ -1,5 +1,5 @@
 {
-  "description": "Navigation policy vectors N1–N9 from the MFS SDK solution design (§2.6). Shared across the mobile SDKs; keep in sync. `newWindow: true` means a window.open / target=_blank request.",
+  "description": "Navigation policy vectors N1–N8 from the MFS SDK solution design (§2.6). Shared across the mobile SDKs; keep in sync. `newWindow: true` means a window.open / target=_blank request.",
   "linkOrigin": "https://link.meshpay.com",
   "vectors": [
     {
@@ -79,13 +79,6 @@
       "url": "http://link.meshpay.com/",
       "isTopFrame": true,
       "expected": { "action": "block" }
-    },
-    {
-      "id": "N9",
-      "url": "https://abc123.localcan.dev/deposit",
-      "isTopFrame": true,
-      "linkOrigin": "https://abc123.localcan.dev",
-      "expected": { "action": "load" }
     }
   ]
 }

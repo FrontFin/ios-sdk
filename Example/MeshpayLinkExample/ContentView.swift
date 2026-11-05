@@ -10,7 +10,6 @@ struct ContentView: View {
     @State private var language = ""
     @State private var displayFiatCurrency = ""
     @State private var integrationId = ""
-    @State private var linkUrl = ""
     @State private var environment: LinkEnvironment = .prod
     @State private var theme: LinkTheme?
 
@@ -45,7 +44,6 @@ struct ContentView: View {
                     ClearableField(title: "Language (e.g. en, es)", text: $language)
                     ClearableField(title: "Display fiat currency (e.g. USD, DKK)", text: $displayFiatCurrency)
                     ClearableField(title: "Integration ID (e.g. metamask)", text: $integrationId)
-                    ClearableField(title: "Link URL (LocalCan tunnel — testing)", text: $linkUrl, keyboardType: .URL)
                 }
 
                 if let lastResult {
@@ -76,8 +74,7 @@ struct ContentView: View {
                     language: language.isEmpty ? nil : language,
                     theme: theme,
                     integrationId: integrationId.isEmpty ? nil : integrationId,
-                    displayFiatCurrency: displayFiatCurrency.isEmpty ? nil : displayFiatCurrency,
-                    linkUrl: linkUrl.isEmpty ? nil : linkUrl
+                    displayFiatCurrency: displayFiatCurrency.isEmpty ? nil : displayFiatCurrency
                 ),
                 onExit: { summary in
                     lastResult = "Exit: \(summary.status == .success ? "success" : "canceled")"

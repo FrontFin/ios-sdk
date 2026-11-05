@@ -98,7 +98,6 @@ actor.
 | `theme` | `.light` / `.dark` / `.system` | — | `system` follows the device appearance. |
 | `integrationId` | `String?` | — | Pre-select a wallet or exchange. |
 | `displayFiatCurrency` | `String?` | — | ISO 4217 code, e.g. `"DKK"`. A hint; Link validates it. |
-| `linkUrl` | `String?` | — | **Testing only.** Load Link from a LocalCan tunnel (`https://*.localcan.dev`). Ignored in release builds, and for any other value. |
 
 A blank (empty or whitespace-only) `token` or `clientId` does not throw: when you
 call `present`, the session ends at once with `onError` and code `.loadError`

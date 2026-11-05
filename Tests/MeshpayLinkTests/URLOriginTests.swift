@@ -38,12 +38,4 @@ struct URLOriginTests {
         #expect(URLOrigin.origin(of: "https://x.example:\u{BD}/") == nil) // ½
         #expect(URLOrigin.origin(of: "https://xn--mnchen-3ya.de/a") == "https://xn--mnchen-3ya.de")
     }
-
-    @Test func recognisesLocalCanTunnels() {
-        #expect(URLOrigin.isLocalCanTunnel("https://abc123.localcan.dev"))
-        #expect(URLOrigin.isLocalCanTunnel("https://abc123.localcan.dev:8443/app"))
-        #expect(!URLOrigin.isLocalCanTunnel("https://localcan.dev"))
-        #expect(!URLOrigin.isLocalCanTunnel("http://abc123.localcan.dev"))
-        #expect(!URLOrigin.isLocalCanTunnel("https://evil.example.com"))
-    }
 }

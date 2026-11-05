@@ -1,7 +1,7 @@
 import Foundation
 
 /// Where a WebView navigation request goes. Covered by the shared navigation
-/// vectors N1–N9 (solution design §2.6).
+/// vectors N1–N8 (solution design §2.6).
 enum NavigationDecision: Equatable {
     /// Load in the WebView.
     case load

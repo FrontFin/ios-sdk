@@ -3,10 +3,10 @@ import Foundation
 /// Builds the Link UI URL exactly like `buildLinkUrl` in `@meshpayhq/link-web-sdk`:
 /// the parameters `token`, `clientId`, `lng`, `th`, `integrationId`, `fiatCur`,
 /// in that order, each only when set, form-encoded. Covered by the shared URL
-/// vectors U1–U12 (solution design §2.4).
+/// vectors in `test-vectors/link-url.json` (solution design §2.4).
 /// A blank input reaching the pure URL builder. The public surface
 /// (``LinkSession``) rejects blanks before this point and reports them through
-/// `onError`; this error is the builder's own guard and the U12 vector's expected
+/// `onError`; this error is the builder's own guard and the U7 vector's expected
 /// failure.
 enum LinkURLBuildError: Error, Equatable {
     case blankToken
@@ -22,29 +22,15 @@ enum LinkURLBuilder {
         let origin: String
     }
 
-    /// Whether this build may load Link from a LocalCan tunnel. Compiled out of
-    /// release builds: the SDK ships as source, so `DEBUG` follows the app's own
-    /// build configuration.
-    static var tunnelOverrideAllowed: Bool {
-        #if DEBUG
-        return true
-        #else
-        return false
-        #endif
-    }
-
     /// - Parameters:
     ///   - isDarkAppearance: the device appearance, used to resolve a `system`
     ///     theme to `light`/`dark` at open time.
-    ///   - allowTunnel: whether `linkUrl` may be honoured at all. Defaults to
-    ///     ``tunnelOverrideAllowed``; injectable so tests can cover release builds.
     /// - Throws: ``LinkURLBuildError`` when `token` or `clientId` is blank.
     static func build(
         token: String,
         clientId: String,
         options: LinkOptions,
-        isDarkAppearance: Bool,
-        allowTunnel: Bool = tunnelOverrideAllowed
+        isDarkAppearance: Bool
     ) throws -> Built {
         let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedToken.isEmpty else {
@@ -55,17 +41,7 @@ enum LinkURLBuilder {
             throw LinkURLBuildError.blankClientId
         }
 
-        // `linkUrl` (testing only) overrides the environment → URL map, but ONLY
-        // in debug builds and only for a LocalCan tunnel (https://*.localcan.dev).
-        // Anyone can register a tunnel subdomain, and the tunnel receives the
-        // token and becomes the trusted bridge origin, so release builds always
-        // fall back to the environment default (SR-9).
-        let base: String
-        if allowTunnel, let linkUrl = options.linkUrl, URLOrigin.isLocalCanTunnel(linkUrl) {
-            base = linkUrl
-        } else {
-            base = Constants.linkURLs[options.environment] ?? Constants.linkURLs[.prod]!
-        }
+        let base = Constants.linkURLs[options.environment] ?? Constants.linkURLs[.prod]!
 
         var params: [(String, String)] = [
             ("token", trimmedToken),
@@ -85,8 +61,7 @@ enum LinkURLBuilder {
         }
 
         let href = appendQuery(to: base, params: params)
-        // `base` is a constant or an origin-checked tunnel URL, so it always has
-        // an origin.
+        // `base` is one of the environment constants, so it always has an origin.
         let origin = URLOrigin.origin(of: href) ?? base
         return Built(href: href, origin: origin)
     }

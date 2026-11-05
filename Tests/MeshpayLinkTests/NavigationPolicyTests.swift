@@ -13,7 +13,6 @@ struct NavVector: Decodable {
     let url: String
     let isTopFrame: Bool?
     let newWindow: Bool?
-    let linkOrigin: String?
     let expected: ExpectedDecision
 }
 
@@ -32,7 +31,7 @@ struct ExpectedDecision: Decodable {
     }
 }
 
-@Suite("Navigation policy — shared vectors (N1–N9)")
+@Suite("Navigation policy — shared vectors (N1–N8)")
 struct NavigationVectorTests {
     static let file: NavVectorFile = {
         let data = try! Vectors.data("navigation.json")
@@ -48,7 +47,7 @@ struct NavigationVectorTests {
             decision = NavigationPolicy.decideNavigation(
                 url: vector.url,
                 isMainFrame: vector.isTopFrame ?? true,
-                linkOrigin: vector.linkOrigin ?? NavigationVectorTests.file.linkOrigin
+                linkOrigin: NavigationVectorTests.file.linkOrigin
             )
         }
         #expect(decision == vector.expected.decision(), "vector \(vector.id)")
