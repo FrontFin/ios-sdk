@@ -1,0 +1,57 @@
+{
+  "description": "Link URL vectors U1–U7 from the MFS SDK solution design (§2.4). Shared across the mobile SDKs; keep in sync.",
+  "vectors": [
+    {
+      "id": "U1",
+      "input": { "token": "tok_123", "clientId": "cid_456", "options": {} },
+      "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456"
+    },
+    {
+      "id": "U2",
+      "input": {
+        "token": "tok_123",
+        "clientId": "cid_456",
+        "options": { "environment": "sbx", "language": "es", "theme": "dark" }
+      },
+      "expected": "https://link.sbx.meshpay.com/?token=tok_123&clientId=cid_456&lng=es&th=dark"
+    },
+    {
+      "id": "U3",
+      "input": {
+        "token": "tok_123",
+        "clientId": "cid_456",
+        "options": { "environment": "dev" }
+      },
+      "expected": "https://link.dev.meshpay.com/?token=tok_123&clientId=cid_456"
+    },
+    {
+      "id": "U4",
+      "input": {
+        "token": "tok_123",
+        "clientId": "cid_456",
+        "options": { "integrationId": "metamask", "displayFiatCurrency": "DKK" }
+      },
+      "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456&integrationId=metamask&fiatCur=DKK"
+    },
+    {
+      "id": "U5",
+      "input": {
+        "token": "tok_123",
+        "clientId": "cid_456",
+        "options": { "theme": "system" },
+        "colorScheme": "dark"
+      },
+      "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456&th=dark"
+    },
+    {
+      "id": "U6",
+      "input": { "token": "tok_123", "clientId": "  cid_456  ", "options": {} },
+      "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456"
+    },
+    {
+      "id": "U7",
+      "input": { "token": "tok_123", "clientId": "   ", "options": {} },
+      "expectedError": true
+    }
+  ]
+}
