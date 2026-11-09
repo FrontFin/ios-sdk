@@ -6,7 +6,8 @@ import UIKit
 /// must always have a way out (solution design §2.8).
 final class CloseButton: UIControl {
     private let backdrop = UIView()
-    private let xmark = UIImageView()
+    private let lineDown = UIView()
+    private let lineUp = UIView()
 
     init(tint: UIColor) {
         super.init(frame: .zero)
@@ -20,13 +21,21 @@ final class CloseButton: UIControl {
         backdrop.translatesAutoresizingMaskIntoConstraints = false
         addSubview(backdrop)
 
-        let configuration = UIImage.SymbolConfiguration(pointSize: 15, weight: .semibold)
-        xmark.image = UIImage(systemName: "xmark", withConfiguration: configuration)
-        xmark.tintColor = tint
-        xmark.contentMode = .center
-        xmark.isUserInteractionEnabled = false
-        xmark.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(xmark)
+        // Two thin strokes rather than an SF Symbol, matching the React Native SDK's ✕.
+        for (line, angle) in [(lineDown, CGFloat.pi / 4), (lineUp, -CGFloat.pi / 4)] {
+            line.backgroundColor = tint
+            line.layer.cornerRadius = 0.5
+            line.isUserInteractionEnabled = false
+            line.translatesAutoresizingMaskIntoConstraints = false
+            line.transform = CGAffineTransform(rotationAngle: angle)
+            addSubview(line)
+            NSLayoutConstraint.activate([
+                line.widthAnchor.constraint(equalToConstant: 16),
+                line.heightAnchor.constraint(equalToConstant: 1),
+                line.centerXAnchor.constraint(equalTo: centerXAnchor),
+                line.centerYAnchor.constraint(equalTo: centerYAnchor)
+            ])
+        }
 
         NSLayoutConstraint.activate([
             widthAnchor.constraint(equalToConstant: 40),
@@ -34,9 +43,7 @@ final class CloseButton: UIControl {
             backdrop.leadingAnchor.constraint(equalTo: leadingAnchor),
             backdrop.trailingAnchor.constraint(equalTo: trailingAnchor),
             backdrop.topAnchor.constraint(equalTo: topAnchor),
-            backdrop.bottomAnchor.constraint(equalTo: bottomAnchor),
-            xmark.centerXAnchor.constraint(equalTo: centerXAnchor),
-            xmark.centerYAnchor.constraint(equalTo: centerYAnchor)
+            backdrop.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 

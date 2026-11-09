@@ -16,11 +16,6 @@ struct ContentView: View {
     @State private var showLink = false
     @State private var lastResult: String?
 
-    private var canOpen: Bool {
-        !clientId.trimmingCharacters(in: .whitespaces).isEmpty
-            && !token.trimmingCharacters(in: .whitespaces).isEmpty
-    }
-
     var body: some View {
         NavigationView {
             Form {
@@ -46,10 +41,8 @@ struct ContentView: View {
                     ClearableField(title: "Integration ID (e.g. metamask)", text: $integrationId)
                 }
 
-                if let lastResult {
-                    Section("Link result") {
-                        Text(lastResult).font(.footnote).foregroundStyle(.secondary)
-                    }
+                Section("Link result") {
+                    Text(lastResult ?? "No result yet").font(.footnote).foregroundStyle(.secondary)
                 }
 
                 Section {
@@ -61,7 +54,6 @@ struct ContentView: View {
                             .foregroundColor(.meshYellow)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    .disabled(!canOpen)
                 }
             }
             .navigationTitle("MeshPay Link")
