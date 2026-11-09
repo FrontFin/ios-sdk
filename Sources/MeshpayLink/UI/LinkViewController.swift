@@ -29,7 +29,6 @@ final class LinkViewController: UIViewController {
 
     private var loadWork: DispatchWorkItem?
     private var graceWork: DispatchWorkItem?
-    private var closeButtonWork: DispatchWorkItem?
 
     init(built: LinkURLBuilder.Built, isDark: Bool, onOutcome: @escaping (LinkOutcome) -> Void) {
         self.built = built
@@ -68,10 +67,11 @@ final class LinkViewController: UIViewController {
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
 
+        // Shown from the start so the user can always leave; hidden once Link
+        // reports `loaded` and draws its own close.
         addCloseButton()
 
         startLoadTimer()
-        startCloseButtonTimer()
         webView.load(URLRequest(url: url))
     }
 
@@ -142,7 +142,6 @@ final class LinkViewController: UIViewController {
         let button = CloseButton(tint: ThemeColor.foreground(isDark: isDark))
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-        button.isHidden = true
         view.addSubview(button)
         NSLayoutConstraint.activate([
             button.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 6),
@@ -191,13 +190,6 @@ final class LinkViewController: UIViewController {
         }
     }
 
-    private func startCloseButtonTimer() {
-        closeButtonWork = schedule(after: Constants.closeButtonDelay) { [weak self] in
-            guard let self, !self.loaded else { return }
-            self.setCloseButton(visible: true)
-        }
-    }
-
     private func schedule(after seconds: TimeInterval, _ block: @escaping () -> Void) -> DispatchWorkItem {
         let work = DispatchWorkItem(block: block)
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: work)
@@ -236,7 +228,6 @@ final class LinkViewController: UIViewController {
         done = true
         cancel(&loadWork)
         cancel(&graceWork)
-        cancel(&closeButtonWork)
         webView?.configuration.userContentController.removeScriptMessageHandler(forName: scriptHandlerName)
         webView?.navigationDelegate = nil
         webView?.uiDelegate = nil
@@ -286,7 +277,6 @@ extension LinkViewController: WKScriptMessageHandler {
             finish(.exit(status))
         case .loaded:
             cancel(&loadWork)
-            cancel(&closeButtonWork)
             loaded = true
             navigationFailed = false
             setCloseButton(visible: false)

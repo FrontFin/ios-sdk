@@ -24,10 +24,6 @@ enum Constants {
     /// down anyway.
     static let closeGrace: TimeInterval = 1
 
-    /// How long the native close button stays hidden after a session opens. If
-    /// Link reports `loaded` sooner, it never appears (Link draws its own close).
-    static let closeButtonDelay: TimeInterval = 3
-
     /// Background shown behind the WebView while Link loads, per resolved theme.
     enum BackgroundColor {
         static let darkHex = "#0E0D0D"
