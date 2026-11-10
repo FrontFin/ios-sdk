@@ -1,7 +1,7 @@
-import MeshpayLink
+import MeshLink
 import SwiftUI
 
-/// A minimal tester for MeshPay Link: paste a client ID and a session token
+/// A minimal tester for Mesh Link: paste a client ID and a session token
 /// (minted on your backend — never ship the client secret in an app), optionally
 /// pick a language and environment, and open Link.
 struct ContentView: View {
@@ -56,8 +56,8 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("MeshPay Link")
-            .meshpayLink(
+            .navigationTitle("Mesh Link")
+            .meshLink(
                 isPresented: $showLink,
                 token: token,
                 clientId: clientId,

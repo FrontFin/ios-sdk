@@ -1,13 +1,13 @@
-# MeshPay Link iOS SDK
+# Mesh Link iOS SDK
 
-Open the hosted **MeshPay Link** UI full screen in an iOS app.
+Open the hosted **Mesh Link** UI full screen in an iOS app.
 
 A thin native wrapper around `link.meshpay.com`: it builds the Link URL, shows it
 in a `WKWebView`, speaks the Link bridge, routes wallet and OAuth hand-offs to the
 OS, and reports exactly one outcome per session. **WebKit, UIKit and SwiftUI only
 — no third-party dependencies.**
 
-Distributed as `MeshpayLink` via Swift Package Manager.
+Distributed as `MeshLink` via Swift Package Manager.
 
 ## Requirements
 
@@ -29,7 +29,7 @@ or in a `Package.swift`:
 .package(url: "https://github.com/FrontFin/ios-sdk.git", from: "0.1.0")
 ```
 
-then add `MeshpayLink` to your target's dependencies.
+then add `MeshLink` to your target's dependencies.
 
 ## Get a session token
 
@@ -40,7 +40,7 @@ to the SDK together with your client ID.
 ## Usage (UIKit)
 
 ```swift
-import MeshpayLink
+import MeshLink
 
 let session = LinkSession(
     token: sessionToken,
@@ -73,7 +73,7 @@ struct DepositButton: View {
 
     var body: some View {
         Button("Deposit") { showLink = true }
-            .meshpayLink(
+            .meshLink(
                 isPresented: $showLink,
                 token: token,
                 clientId: clientId,
@@ -150,7 +150,7 @@ return to it afterwards.
 
 ## Example app
 
-[`Example/`](Example) is a SwiftUI app that wires up `.meshpayLink(...)`. It uses
+[`Example/`](Example) is a SwiftUI app that wires up `.meshLink(...)`. It uses
 [XcodeGen](https://github.com/yonaskolb/XcodeGen) — run `xcodegen generate` in
 `Example/` to produce the Xcode project, then open and run it. Paste a client ID
 and a session token to launch Link.
@@ -161,15 +161,15 @@ and a session token to launch Link.
 | --- | --- |
 | `swift build` | Build the package. |
 | `swift test` | Run the `Core` unit tests (URL, navigation, bridge, scripts) against the shared vectors. |
-| `xcodebuild -scheme MeshpayLink -destination 'generic/platform=iOS Simulator' build` | Compile the full UIKit/SwiftUI surface. |
+| `xcodebuild -scheme MeshLink -destination 'generic/platform=iOS Simulator' build` | Compile the full UIKit/SwiftUI surface. |
 
 The URL and navigation test vectors in [`test-vectors/`](test-vectors) are shared
-with the other MeshPay mobile SDKs — keep them in sync.
+with the other Mesh mobile SDKs — keep them in sync.
 
 ### Versioning
 
 The SDK version lives in both [`VERSION`](VERSION) and
-[`Sources/MeshpayLink/Version.swift`](Sources/MeshpayLink/Version.swift); CI fails
+[`Sources/MeshLink/Version.swift`](Sources/MeshLink/Version.swift); CI fails
 when they disagree. Bump both with the `bump-version` skill
 ([`.claude/commands/bump-version.md`](.claude/commands/bump-version.md)). SPM
 resolves git tags, so the GitHub Release (tag `X.Y.Z`) is the publication. There is

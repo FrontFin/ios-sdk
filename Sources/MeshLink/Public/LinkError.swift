@@ -44,7 +44,7 @@ public struct LinkExitSummary: Sendable, Equatable {
 ///
 /// An open set: new codes can be added in minor versions, so a `switch` over a
 /// code needs a `default` branch. `rawValue` is the wire string shared with the
-/// other MeshPay SDKs (e.g. `"load-error"`).
+/// other Mesh SDKs (e.g. `"load-error"`).
 public struct LinkErrorCode: RawRepresentable, Hashable, Sendable, CustomStringConvertible {
     public let rawValue: String
 

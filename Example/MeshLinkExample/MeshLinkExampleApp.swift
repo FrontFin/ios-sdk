@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct MeshpayLinkExampleApp: App {
+struct MeshLinkExampleApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

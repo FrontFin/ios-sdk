@@ -1,6 +1,6 @@
 import Foundation
 
-/// Builds the Link UI URL exactly like `buildLinkUrl` in `@meshpayhq/link-web-sdk`:
+/// Builds the Link UI URL:
 /// the parameters `token`, `clientId`, `lng`, `th`, `integrationId`, `fiatCur`,
 /// in that order, each only when set, form-encoded. Covered by the shared URL
 /// vectors in `test-vectors/link-url.json` (solution design §2.4).

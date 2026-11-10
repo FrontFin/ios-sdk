@@ -7,7 +7,7 @@ import UIKit
 final class LoaderView: UIView {
     private static let diameter: CGFloat = 24
     private static let lineWidth: CGFloat = 2
-    private static let rotationKey = "meshpay.loader.rotation"
+    private static let rotationKey = "mesh.loader.rotation"
 
     private let track = CAShapeLayer()
     private let arc = CAShapeLayer()

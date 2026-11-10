@@ -80,7 +80,7 @@ final class LinkViewController: UIViewController {
     }
 
     /// The host dismissed Link, or something below it (logout swapping the UI, a
-    /// deep link resetting it, the sheet holding `.meshpayLink` closing), without
+    /// deep link resetting it, the sheet holding `.meshLink` closing), without
     /// going through ``finish(_:)``. End the session so exactly one outcome is
     /// still delivered and the single-use token can't be presented again.
     override func viewDidDisappear(_ animated: Bool) {

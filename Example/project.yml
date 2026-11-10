@@ -1,24 +1,24 @@
-name: MeshpayLinkExample
+name: MeshLinkExample
 options:
-  bundleIdPrefix: com.meshpay.example
+  bundleIdPrefix: com.meshpay.ios
   deploymentTarget:
     iOS: "15.0"
   createIntermediateGroups: true
 
 packages:
-  MeshpayLink:
+  MeshLink:
     # The local SDK, one directory up.
     path: ..
 
 targets:
-  MeshpayLinkExample:
+  MeshLinkExample:
     type: application
     platform: iOS
     sources:
-      - MeshpayLinkExample
+      - MeshLinkExample
     dependencies:
-      - package: MeshpayLink
-        product: MeshpayLink
+      - package: MeshLink
+        product: MeshLink
     settings:
       base:
         DEVELOPMENT_TEAM: C6WMXUCWYF
@@ -27,6 +27,6 @@ targets:
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
         GENERATE_INFOPLIST_FILE: YES
-        PRODUCT_BUNDLE_IDENTIFIER: com.meshpay.example.MeshpayLinkExample
+        PRODUCT_BUNDLE_IDENTIFIER: com.meshpay.ios.example
         SWIFT_VERSION: "6.0"
         TARGETED_DEVICE_FAMILY: "1,2"
