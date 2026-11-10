@@ -373,6 +373,13 @@ extension LinkViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        // Link's page has started drawing, so it takes over from the native
+        // spinner. An error page or a foreign page does not count.
+        if let urlString = webView.url?.absoluteString,
+           URLOrigin.origin(of: urlString) == built.origin {
+            cancel(&loaderWork)
+            loader?.isHidden = true
+        }
         updateCloseButtonForCurrentPage()
     }
 
