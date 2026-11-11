@@ -15,8 +15,8 @@ enum LinkOutcome {
 final class LinkViewController: UIViewController {
     private let scriptHandlerName = "jsMessageHandler"
 
-    private let built: LinkURLBuilder.Built
-    private let isDark: Bool
+    let built: LinkURLBuilder.Built
+    let isDark: Bool
     private let onOutcome: (LinkOutcome) -> Void
 
     private var webView: WKWebView?

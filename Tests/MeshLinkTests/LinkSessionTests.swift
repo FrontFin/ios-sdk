@@ -41,22 +41,39 @@ struct LinkSessionTests {
         #expect(captured?.message == "Link could not be presented.")
     }
 
-    @Test func systemThemeFollowsDeviceNotHostOverride() {
-        // A host that forces the opposite of the device appearance must not
-        // change what `system` resolves to.
+    /// A window whose app-level appearance is forced to the opposite of the
+    /// device's, like a host using `overrideUserInterfaceStyle`.
+    private func overriddenWindow() -> (window: UIWindow, deviceIsDark: Bool) {
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         let deviceIsDark = window.screen.traitCollection.userInterfaceStyle == .dark
         window.overrideUserInterfaceStyle = deviceIsDark ? .light : .dark
-        #expect(window.traitCollection.userInterfaceStyle != window.screen.traitCollection.userInterfaceStyle)
-        #expect(LinkSession.resolveIsDark(.system, in: window) == deviceIsDark)
+        return (window, deviceIsDark)
     }
 
-    @Test func explicitThemeIgnoresAppearance() {
-        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-        window.overrideUserInterfaceStyle = .dark
-        #expect(LinkSession.resolveIsDark(.light, in: window) == false)
-        window.overrideUserInterfaceStyle = .light
-        #expect(LinkSession.resolveIsDark(.dark, in: window) == true)
+    @Test(arguments: [LinkTheme.system, nil])
+    func systemThemeFollowsDeviceNotHostOverride(_ theme: LinkTheme?) throws {
+        let (window, deviceIsDark) = overriddenWindow()
+        #expect(window.traitCollection.userInterfaceStyle != window.screen.traitCollection.userInterfaceStyle)
+
+        let session = LinkSession(token: "t", clientId: "c", options: LinkOptions(theme: theme), onExit: { _ in }, onError: { _ in })
+        let controller = try #require(session.makeController(token: "t", clientId: "c", in: window))
+
+        // Both the native chrome and the URL follow the device.
+        #expect(controller.isDark == deviceIsDark)
+        let expectedTh = theme == nil ? nil : (deviceIsDark ? "th=dark" : "th=light")
+        #expect(controller.built.href.contains("th=") == (expectedTh != nil))
+        if let expectedTh {
+            #expect(controller.built.href.contains(expectedTh))
+        }
+    }
+
+    @Test(arguments: [LinkTheme.light, .dark])
+    func explicitThemeWinsOverDevice(_ theme: LinkTheme) throws {
+        let (window, _) = overriddenWindow()
+        let session = LinkSession(token: "t", clientId: "c", options: LinkOptions(theme: theme), onExit: { _ in }, onError: { _ in })
+        let controller = try #require(session.makeController(token: "t", clientId: "c", in: window))
+        #expect(controller.isDark == (theme == .dark))
+        #expect(controller.built.href.contains("th=\(theme.rawValue)"))
     }
 }
 #endif

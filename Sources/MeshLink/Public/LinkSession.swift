@@ -93,23 +93,10 @@ public final class LinkSession {
             return
         }
 
-        let isDark = Self.resolveIsDark(options.theme ?? .system, in: window)
-
-        guard let built = try? LinkURLBuilder.build(
-            token: trimmedToken,
-            clientId: trimmedClientId,
-            options: options,
-            isDarkAppearance: isDark
-        ) else {
+        guard let controller = makeController(token: trimmedToken, clientId: trimmedClientId, in: window) else {
             // Unreachable: the blanks are handled above.
             deliver(.error(LinkError(code: .loadError, message: "The Link URL could not be built.")))
             return
-        }
-
-        // Captured strongly on purpose: the presented controller keeps the session
-        // alive, so an integrator need not store it. No cycle — `controller` is weak.
-        let controller = LinkViewController(built: built, isDark: isDark) { outcome in
-            self.deliver(outcome)
         }
         controller.modalPresentationStyle = .fullScreen
         controller.modalPresentationCapturesStatusBarAppearance = true
@@ -161,20 +148,33 @@ public final class LinkSession {
         }
     }
 
-    /// Whether Link opens dark. `system` follows the device appearance, not the
-    /// host app's: a host override — UIKit's `overrideUserInterfaceStyle` or
-    /// SwiftUI's `.preferredColorScheme`, which lands on the window scene —
-    /// flows into the presenter's, window's and scene's traits, so only the
-    /// screen's traits still report the device setting.
-    static func resolveIsDark(_ theme: LinkTheme, in window: UIWindow) -> Bool {
-        switch theme {
-        case .dark:
-            return true
-        case .light:
-            return false
-        case .system:
-            return window.screen.traitCollection.userInterfaceStyle == .dark
+    /// Builds Link's controller with the theme resolved against `window`'s
+    /// device appearance. Nil only if the URL can't be built.
+    func makeController(token: String, clientId: String, in window: UIWindow) -> LinkViewController? {
+        let deviceIsDark = Self.deviceIsDark(in: window)
+        guard let built = try? LinkURLBuilder.build(
+            token: token,
+            clientId: clientId,
+            options: options,
+            isDarkAppearance: deviceIsDark
+        ) else {
+            return nil
         }
+        let isDark = LinkURLBuilder.resolvesDark(options.theme ?? .system, isDarkAppearance: deviceIsDark)
+        // Captured strongly on purpose: the presented controller keeps the session
+        // alive, so an integrator need not store it. No cycle — `controller` is weak.
+        return LinkViewController(built: built, isDark: isDark) { outcome in
+            self.deliver(outcome)
+        }
+    }
+
+    /// The device appearance, not the host app's: a host override — UIKit's
+    /// `overrideUserInterfaceStyle` or SwiftUI's `.preferredColorScheme`, which
+    /// lands on the window scene — flows into the presenter's, window's and
+    /// scene's traits, so only the screen's traits still report the device
+    /// setting.
+    static func deviceIsDark(in window: UIWindow) -> Bool {
+        window.screen.traitCollection.userInterfaceStyle == .dark
     }
 }
 #endif

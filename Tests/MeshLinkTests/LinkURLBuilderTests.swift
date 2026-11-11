@@ -103,6 +103,14 @@ struct LinkURLBuilderTests {
         #expect(LinkURLBuilder.resolveTheme(.system, isDarkAppearance: true) == "dark")
         #expect(LinkURLBuilder.resolveTheme(.system, isDarkAppearance: false) == "light")
     }
+
+    @Test func resolvesDarkForEveryThemeAndAppearance() {
+        for appearance in [false, true] {
+            #expect(LinkURLBuilder.resolvesDark(.light, isDarkAppearance: appearance) == false)
+            #expect(LinkURLBuilder.resolvesDark(.dark, isDarkAppearance: appearance) == true)
+            #expect(LinkURLBuilder.resolvesDark(.system, isDarkAppearance: appearance) == appearance)
+        }
+    }
 }
 
 extension URLVector: CustomTestStringConvertible {
