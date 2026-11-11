@@ -1,7 +1,7 @@
-# MeshpayLinkExample
+# MeshLinkExample
 
-A SwiftUI app that wires up the SDK's `.meshpayLink(...)` modifier against the
-local `MeshpayLink` package.
+A SwiftUI app that wires up the SDK's `.meshLink(...)` modifier against the
+local `MeshLink` package.
 
 The Xcode project is generated from [`project.yml`](project.yml) with
 [XcodeGen](https://github.com/yonaskolb/XcodeGen) (so no `.xcodeproj` is committed):
@@ -10,7 +10,14 @@ The Xcode project is generated from [`project.yml`](project.yml) with
 brew install xcodegen   # once
 cd Example
 xcodegen generate
-open MeshpayLinkExample.xcodeproj
+open MeshLinkExample.xcodeproj
+```
+
+To run on a device, set your Apple team in an untracked `Config/Local.xcconfig`
+(simulator builds need no signing):
+
+```bash
+cp Config/Local.xcconfig.example Config/Local.xcconfig   # then set DEVELOPMENT_TEAM
 ```
 
 Run it on a simulator or device, paste a **client ID** and a **session token**

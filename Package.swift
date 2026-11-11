@@ -1,27 +1,27 @@
 // swift-tools-version: 6.0
-// MeshpayLink — the MeshPay Link iOS SDK.
+// MeshLink — the Mesh Link iOS SDK.
 //
-// A thin native wrapper that opens the hosted MeshPay Link UI full screen in a
+// A thin native wrapper that opens the hosted Mesh Link UI full screen in a
 // WKWebView. WebKit, UIKit and SwiftUI only — no third-party dependencies.
 
 import PackageDescription
 
 let package = Package(
-    name: "MeshpayLink",
+    name: "MeshLink",
     defaultLocalization: "en",
     platforms: [
         .iOS(.v15)
     ],
     products: [
         .library(
-            name: "MeshpayLink",
-            targets: ["MeshpayLink"]
+            name: "MeshLink",
+            targets: ["MeshLink"]
         )
     ],
     targets: [
         .target(
-            name: "MeshpayLink",
-            path: "Sources/MeshpayLink",
+            name: "MeshLink",
+            path: "Sources/MeshLink",
             resources: [
                 .copy("PrivacyInfo.xcprivacy")
             ],
@@ -30,9 +30,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "MeshpayLinkTests",
-            dependencies: ["MeshpayLink"],
-            path: "Tests/MeshpayLinkTests",
+            name: "MeshLinkTests",
+            dependencies: ["MeshLink"],
+            path: "Tests/MeshLinkTests",
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ]

@@ -1,4 +1,4 @@
-# Runs on pull requests to main and on manual triggers. Mirrors the other MeshPay
+# Runs on pull requests to main and on manual triggers. Mirrors the other Mesh
 # mobile SDKs' CI, adapted for Swift Package Manager on macOS: build, unit tests
 # against the shared vectors, SwiftLint, compile the Example app, and assert that
 # VERSION and Version.swift agree.
@@ -37,7 +37,7 @@ jobs:
       - name: Assert VERSION matches Version.swift 🏷️
         run: |
           VERSION_FILE=$(tr -d '[:space:]' < VERSION)
-          VERSION_SWIFT=$(grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' Sources/MeshpayLink/Version.swift | head -n 1)
+          VERSION_SWIFT=$(grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' Sources/MeshLink/Version.swift | head -n 1)
           echo "VERSION=$VERSION_FILE  Version.swift=$VERSION_SWIFT"
           if [ "$VERSION_FILE" != "$VERSION_SWIFT" ]; then
             echo "::error::VERSION ($VERSION_FILE) and Version.swift ($VERSION_SWIFT) disagree"
@@ -57,7 +57,7 @@ jobs:
           SIMULATOR_ID=$(xcrun simctl list devices available -j \
             | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k,v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')))")
           xcodebuild test \
-            -scheme MeshpayLink \
+            -scheme MeshLink \
             -destination "id=$SIMULATOR_ID"
 
       - name: Lint 🧹
@@ -71,6 +71,6 @@ jobs:
           cd Example
           xcodegen generate
           xcodebuild build \
-            -project MeshpayLinkExample.xcodeproj \
-            -scheme MeshpayLinkExample \
+            -project MeshLinkExample.xcodeproj \
+            -scheme MeshLinkExample \
             -destination 'generic/platform=iOS Simulator'

@@ -7,7 +7,7 @@ enum Vectors {
     static func data(_ name: String) throws -> Data {
         let thisFile = URL(fileURLWithPath: #filePath)
         let root = thisFile
-            .deletingLastPathComponent() // Tests/MeshpayLinkTests
+            .deletingLastPathComponent() // Tests/MeshLinkTests
             .deletingLastPathComponent() // Tests
             .deletingLastPathComponent() // repo root
         let url = root.appendingPathComponent("test-vectors").appendingPathComponent(name)

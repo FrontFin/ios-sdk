@@ -1,6 +1,6 @@
 import Testing
 
-@testable import MeshpayLink
+@testable import MeshLink
 
 @Suite("Injected scripts")
 struct ScriptBuilderTests {

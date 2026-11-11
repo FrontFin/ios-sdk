@@ -21,15 +21,16 @@ final class LinkViewController: UIViewController {
 
     private var webView: WKWebView?
     private var closeButton: CloseButton?
+    private var loader: LoaderView?
 
     private var done = false
     private var closing = false
-    private var loaded = false
-    private var navigationFailed = false
+    private var chrome = LoadingChrome()
 
     private var loadWork: DispatchWorkItem?
     private var graceWork: DispatchWorkItem?
     private var closeButtonWork: DispatchWorkItem?
+    private var loaderWork: DispatchWorkItem?
 
     init(built: LinkURLBuilder.Built, isDark: Bool, onOutcome: @escaping (LinkOutcome) -> Void) {
         self.built = built
@@ -68,15 +69,16 @@ final class LinkViewController: UIViewController {
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
 
+        addLoader()
         addCloseButton()
 
         startLoadTimer()
-        startCloseButtonTimer()
+        startChromeTimers()
         webView.load(URLRequest(url: url))
     }
 
     /// The host dismissed Link, or something below it (logout swapping the UI, a
-    /// deep link resetting it, the sheet holding `.meshpayLink` closing), without
+    /// deep link resetting it, the sheet holding `.meshLink` closing), without
     /// going through ``finish(_:)``. End the session so exactly one outcome is
     /// still delivered and the single-use token can't be presented again.
     override func viewDidDisappear(_ animated: Bool) {
@@ -136,6 +138,20 @@ final class LinkViewController: UIViewController {
         return webView
     }
 
+    // MARK: - Loader
+
+    private func addLoader() {
+        let loader = LoaderView(tint: ThemeColor.foreground(isDark: isDark))
+        loader.translatesAutoresizingMaskIntoConstraints = false
+        loader.isHidden = true
+        view.addSubview(loader)
+        NSLayoutConstraint.activate([
+            loader.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loader.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        self.loader = loader
+    }
+
     // MARK: - Close button
 
     private func addCloseButton() {
@@ -151,9 +167,12 @@ final class LinkViewController: UIViewController {
         closeButton = button
     }
 
-    private func setCloseButton(visible: Bool) {
-        closeButton?.isHidden = !visible
-        if visible {
+    /// Applies an event to ``LoadingChrome`` and mirrors the result on screen.
+    private func updateChrome(_ event: (inout LoadingChrome) -> Void) {
+        event(&chrome)
+        loader?.isHidden = !chrome.isLoaderVisible
+        closeButton?.isHidden = !chrome.isCloseButtonVisible
+        if chrome.isCloseButtonVisible {
             closeButton.map { view.bringSubviewToFront($0) }
         }
     }
@@ -191,10 +210,12 @@ final class LinkViewController: UIViewController {
         }
     }
 
-    private func startCloseButtonTimer() {
+    private func startChromeTimers() {
+        loaderWork = schedule(after: Constants.loaderDelay) { [weak self] in
+            self?.updateChrome { $0.loaderDelayElapsed() }
+        }
         closeButtonWork = schedule(after: Constants.closeButtonDelay) { [weak self] in
-            guard let self, !self.loaded else { return }
-            self.setCloseButton(visible: true)
+            self?.updateChrome { $0.closeButtonDelayElapsed() }
         }
     }
 
@@ -215,9 +236,8 @@ final class LinkViewController: UIViewController {
     /// that, a failed navigation must not discard a session the user may be
     /// halfway through: surface the native close button instead.
     private func handleLoadFailure() {
-        if loaded, !closing {
-            navigationFailed = true
-            setCloseButton(visible: true)
+        if chrome.isLoaded, !closing {
+            updateChrome { $0.navigationFailedAfterLoad() }
         } else {
             fail(.loadError, "The Link page failed to load.")
         }
@@ -237,6 +257,8 @@ final class LinkViewController: UIViewController {
         cancel(&loadWork)
         cancel(&graceWork)
         cancel(&closeButtonWork)
+        cancel(&loaderWork)
+        updateChrome { $0.ended() }
         webView?.configuration.userContentController.removeScriptMessageHandler(forName: scriptHandlerName)
         webView?.navigationDelegate = nil
         webView?.uiDelegate = nil
@@ -259,15 +281,12 @@ final class LinkViewController: UIViewController {
         return "\(scheme)://\(host):\(origin.port)"
     }
 
-    private func updateCloseButtonForCurrentPage() {
-        guard loaded else {
-            return
+    /// The WebView currently shows a page on Link's origin.
+    private var isOnLinkOrigin: Bool {
+        guard let urlString = webView?.url?.absoluteString else {
+            return false
         }
-        var currentOrigin: String?
-        if let urlString = webView?.url?.absoluteString {
-            currentOrigin = URLOrigin.origin(of: urlString)
-        }
-        setCloseButton(visible: navigationFailed || currentOrigin != built.origin)
+        return URLOrigin.origin(of: urlString) == built.origin
     }
 }
 
@@ -287,9 +306,8 @@ extension LinkViewController: WKScriptMessageHandler {
         case .loaded:
             cancel(&loadWork)
             cancel(&closeButtonWork)
-            loaded = true
-            navigationFailed = false
-            setCloseButton(visible: false)
+            cancel(&loaderWork)
+            updateChrome { $0.linkLoaded() }
             webView?.evaluateJavaScript(ScriptBuilder.sdkSpecsScript(version: SDKVersion.current), completionHandler: nil)
         case nil:
             break
@@ -339,17 +357,18 @@ extension LinkViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        // A new top-frame navigation replaces any failed document.
-        navigationFailed = false
+        updateChrome { $0.navigationStarted() }
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        updateCloseButtonForCurrentPage()
+        let onLinkOrigin = isOnLinkOrigin
+        updateChrome { $0.pageCommitted(onLinkOrigin: onLinkOrigin) }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         cancel(&loadWork)
-        updateCloseButtonForCurrentPage()
+        let onLinkOrigin = isOnLinkOrigin
+        updateChrome { $0.pageFinished(onLinkOrigin: onLinkOrigin) }
     }
 
     func webView(

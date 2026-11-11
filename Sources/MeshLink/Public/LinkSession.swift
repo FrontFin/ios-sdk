@@ -1,7 +1,7 @@
 #if canImport(UIKit)
 import UIKit
 
-/// One MeshPay Link session.
+/// One Mesh Link session.
 ///
 /// Mint a session token on **your backend** (never ship your client secret in
 /// the app), create a `LinkSession`, then present it:
@@ -42,7 +42,7 @@ public final class LinkSession {
 
     /// - Parameters:
     ///   - token: Session token from `POST /v2/sessions`, minted by your backend.
-    ///   - clientId: Your MeshPay client ID.
+    ///   - clientId: Your Mesh client ID.
     ///   - options: Optional Link settings.
     ///   - onExit: Called once when the session ends normally.
     ///   - onError: Called once when Link can't be shown or can't continue —

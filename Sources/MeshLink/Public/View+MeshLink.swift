@@ -3,10 +3,10 @@ import SwiftUI
 import UIKit
 
 public extension View {
-    /// Presents MeshPay Link full screen while `isPresented` is `true`.
+    /// Presents Mesh Link full screen while `isPresented` is `true`.
     ///
     /// ```swift
-    /// .meshpayLink(
+    /// .meshLink(
     ///     isPresented: $showLink,
     ///     token: token,
     ///     clientId: clientId,
@@ -18,7 +18,7 @@ public extension View {
     ///
     /// Exactly one of `onExit` / `onError` fires per session; `isPresented` is
     /// set back to `false` for you when the session ends.
-    func meshpayLink(
+    func meshLink(
         isPresented: Binding<Bool>,
         token: String,
         clientId: String,
@@ -27,7 +27,7 @@ public extension View {
         onError: @escaping (LinkError) -> Void
     ) -> some View {
         background(
-            MeshpayLinkPresenter(
+            MeshLinkPresenter(
                 isPresented: isPresented,
                 token: token,
                 clientId: clientId,
@@ -41,7 +41,7 @@ public extension View {
 
 /// An invisible host whose coordinator owns the single ``LinkSession`` and
 /// mirrors it to the `isPresented` binding.
-private struct MeshpayLinkPresenter: UIViewControllerRepresentable {
+private struct MeshLinkPresenter: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
     let token: String
     let clientId: String
@@ -62,7 +62,7 @@ private struct MeshpayLinkPresenter: UIViewControllerRepresentable {
         context.coordinator.sync(isPresented: isPresented, host: host)
     }
 
-    /// The view carrying `.meshpayLink` was removed: no update with
+    /// The view carrying `.meshLink` was removed: no update with
     /// `isPresented == false` will follow, so end the session here.
     static func dismantleUIViewController(_ host: UIViewController, coordinator: Coordinator) {
         coordinator.end()
@@ -70,13 +70,13 @@ private struct MeshpayLinkPresenter: UIViewControllerRepresentable {
 
     @MainActor
     final class Coordinator {
-        var parent: MeshpayLinkPresenter
+        var parent: MeshLinkPresenter
         private var session: LinkSession?
         private var presenting = false
         /// Created but not yet presented: `present` is deferred a runloop tick.
         private var pending = false
 
-        init(_ parent: MeshpayLinkPresenter) {
+        init(_ parent: MeshLinkPresenter) {
             self.parent = parent
         }
 

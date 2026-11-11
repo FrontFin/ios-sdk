@@ -26,7 +26,13 @@ enum Constants {
 
     /// How long the native close button stays hidden after a session opens. If
     /// Link reports `loaded` sooner, it never appears (Link draws its own close).
-    static let closeButtonDelay: TimeInterval = 3
+    /// Matches the React Native SDK's `CLOSE_BUTTON_DELAY_MS`.
+    static let closeButtonDelay: TimeInterval = 2
+
+    /// How long the loader stays hidden after a session opens, so a fast load
+    /// never flashes it. If Link reports `loaded` sooner, it never appears.
+    /// Matches the React Native SDK's `LOADER_DELAY_MS`.
+    static let loaderDelay: TimeInterval = 1
 
     /// Background shown behind the WebView while Link loads, per resolved theme.
     enum BackgroundColor {

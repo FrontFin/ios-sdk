@@ -2,7 +2,7 @@
 import UIKit
 import Testing
 
-@testable import MeshpayLink
+@testable import MeshLink
 
 @Suite("LinkSession configuration")
 @MainActor

@@ -1,7 +1,7 @@
-import MeshpayLink
+import MeshLink
 import SwiftUI
 
-/// A minimal tester for MeshPay Link: paste a client ID and a session token
+/// A minimal tester for Mesh Link: paste a client ID and a session token
 /// (minted on your backend — never ship the client secret in an app), optionally
 /// pick a language and environment, and open Link.
 struct ContentView: View {
@@ -15,11 +15,6 @@ struct ContentView: View {
 
     @State private var showLink = false
     @State private var lastResult: String?
-
-    private var canOpen: Bool {
-        !clientId.trimmingCharacters(in: .whitespaces).isEmpty
-            && !token.trimmingCharacters(in: .whitespaces).isEmpty
-    }
 
     var body: some View {
         NavigationView {
@@ -46,10 +41,8 @@ struct ContentView: View {
                     ClearableField(title: "Integration ID (e.g. metamask)", text: $integrationId)
                 }
 
-                if let lastResult {
-                    Section("Link result") {
-                        Text(lastResult).font(.footnote).foregroundStyle(.secondary)
-                    }
+                Section("Result") {
+                    Text(lastResult ?? "No result yet").font(.footnote).foregroundStyle(.secondary)
                 }
 
                 Section {
@@ -61,11 +54,10 @@ struct ContentView: View {
                             .foregroundColor(.meshYellow)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    .disabled(!canOpen)
                 }
             }
-            .navigationTitle("MeshPay Link")
-            .meshpayLink(
+            .navigationTitle("Mesh Link iOS")
+            .meshLink(
                 isPresented: $showLink,
                 token: token,
                 clientId: clientId,

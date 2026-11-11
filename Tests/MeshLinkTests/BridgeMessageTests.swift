@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import MeshpayLink
+@testable import MeshLink
 
 @Suite("Bridge message parsing")
 struct BridgeMessageTests {

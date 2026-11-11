@@ -1,5 +1,5 @@
 ---
-description: Bump the MeshPay iOS SDK version (VERSION + Version.swift + CHANGELOG) and open a release PR.
+description: Bump the Mesh iOS SDK version (VERSION + Version.swift + CHANGELOG) and open a release PR.
 ---
 
 Bump the SDK version in lockstep across the two files CI checks, add the changelog
@@ -16,7 +16,7 @@ Steps:
    Refuse if it is not strictly greater than the current one.
 3. Update **both** of these to the new version — they MUST match or CI fails:
    - `VERSION` (the bare `X.Y.Z`, one line).
-   - `Sources/MeshpayLink/Version.swift` (`static let current = "X.Y.Z"`).
+   - `Sources/MeshLink/Version.swift` (`static let current = "X.Y.Z"`).
 4. Add a `## X.Y.Z` section at the top of `CHANGELOG.md` (under the header),
    following Keep a Changelog, summarising what changed since the last tag. Every
    release needs a matching `## X.Y.Z` entry.
