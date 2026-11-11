@@ -41,7 +41,7 @@ struct ContentView: View {
                     ClearableField(title: "Integration ID (e.g. metamask)", text: $integrationId)
                 }
 
-                Section("Link result") {
+                Section("Result") {
                     Text(lastResult ?? "No result yet").font(.footnote).foregroundStyle(.secondary)
                 }
 
@@ -56,7 +56,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Mesh Link")
+            .navigationTitle("Mesh Link iOS")
             .meshLink(
                 isPresented: $showLink,
                 token: token,
