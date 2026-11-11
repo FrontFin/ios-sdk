@@ -82,22 +82,18 @@ public final class LinkSession {
             return
         }
 
-        let isDark: Bool
-        switch options.theme ?? .system {
-        case .dark:
-            isDark = true
-        case .light:
-            isDark = false
-        case .system:
-            // The device appearance, not the host app's. A host override —
-            // UIKit's `overrideUserInterfaceStyle` or SwiftUI's
-            // `.preferredColorScheme`, which lands on the window scene — flows
-            // into the presenter's, window's and scene's traits; only the
-            // screen's traits still report the device setting.
-            let traits = presenter.viewIfLoaded?.window?.screen.traitCollection
-                ?? presenter.traitCollection
-            isDark = traits.userInterfaceStyle == .dark
+        // Present over whatever is already on screen; presenting straight from
+        // `presenter` would be a silent no-op if it is already presenting.
+        let target = presenter.topmostPresenter()
+        // A presenter that isn't in a window can't present. Without this, `present`
+        // is a no-op, UIKit never retains the controller (``controller`` is weak),
+        // and neither callback would ever fire — so report it instead.
+        guard let window = target.viewIfLoaded?.window else {
+            deliver(.error(LinkError(code: .loadError, message: "Link could not be presented.")))
+            return
         }
+
+        let isDark = Self.resolveIsDark(options.theme ?? .system, in: window)
 
         guard let built = try? LinkURLBuilder.build(
             token: trimmedToken,
@@ -107,17 +103,6 @@ public final class LinkSession {
         ) else {
             // Unreachable: the blanks are handled above.
             deliver(.error(LinkError(code: .loadError, message: "The Link URL could not be built.")))
-            return
-        }
-
-        // Present over whatever is already on screen; presenting straight from
-        // `presenter` would be a silent no-op if it is already presenting.
-        let target = presenter.topmostPresenter()
-        // A presenter that isn't in a window can't present. Without this, `present`
-        // is a no-op, UIKit never retains the controller (``controller`` is weak),
-        // and neither callback would ever fire — so report it instead.
-        guard target.viewIfLoaded?.window != nil else {
-            deliver(.error(LinkError(code: .loadError, message: "Link could not be presented.")))
             return
         }
 
@@ -173,6 +158,22 @@ public final class LinkSession {
             onExit(LinkExitSummary(status: status))
         case let .error(error):
             onError(error)
+        }
+    }
+
+    /// Whether Link opens dark. `system` follows the device appearance, not the
+    /// host app's: a host override — UIKit's `overrideUserInterfaceStyle` or
+    /// SwiftUI's `.preferredColorScheme`, which lands on the window scene —
+    /// flows into the presenter's, window's and scene's traits, so only the
+    /// screen's traits still report the device setting.
+    static func resolveIsDark(_ theme: LinkTheme, in window: UIWindow) -> Bool {
+        switch theme {
+        case .dark:
+            return true
+        case .light:
+            return false
+        case .system:
+            return window.screen.traitCollection.userInterfaceStyle == .dark
         }
     }
 }

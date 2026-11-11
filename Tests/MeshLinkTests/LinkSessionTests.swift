@@ -40,5 +40,23 @@ struct LinkSessionTests {
         #expect(captured?.code == .loadError)
         #expect(captured?.message == "Link could not be presented.")
     }
+
+    @Test func systemThemeFollowsDeviceNotHostOverride() {
+        // A host that forces the opposite of the device appearance must not
+        // change what `system` resolves to.
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        let deviceIsDark = window.screen.traitCollection.userInterfaceStyle == .dark
+        window.overrideUserInterfaceStyle = deviceIsDark ? .light : .dark
+        #expect(window.traitCollection.userInterfaceStyle != window.screen.traitCollection.userInterfaceStyle)
+        #expect(LinkSession.resolveIsDark(.system, in: window) == deviceIsDark)
+    }
+
+    @Test func explicitThemeIgnoresAppearance() {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        window.overrideUserInterfaceStyle = .dark
+        #expect(LinkSession.resolveIsDark(.light, in: window) == false)
+        window.overrideUserInterfaceStyle = .light
+        #expect(LinkSession.resolveIsDark(.dark, in: window) == true)
+    }
 }
 #endif
