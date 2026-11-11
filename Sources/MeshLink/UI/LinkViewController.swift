@@ -37,6 +37,9 @@ final class LinkViewController: UIViewController {
         self.isDark = isDark
         self.onOutcome = onOutcome
         super.init(nibName: nil, bundle: nil)
+        // Keep system UI inside Link (keyboard, WebView controls) on the resolved
+        // theme rather than inheriting the host app's override.
+        overrideUserInterfaceStyle = isDark ? .dark : .light
     }
 
     @available(*, unavailable)

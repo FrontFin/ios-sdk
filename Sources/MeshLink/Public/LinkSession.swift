@@ -89,7 +89,14 @@ public final class LinkSession {
         case .light:
             isDark = false
         case .system:
-            isDark = presenter.traitCollection.userInterfaceStyle == .dark
+            // The device appearance, not the host app's. A host override —
+            // UIKit's `overrideUserInterfaceStyle` or SwiftUI's
+            // `.preferredColorScheme`, which lands on the window scene — flows
+            // into the presenter's, window's and scene's traits; only the
+            // screen's traits still report the device setting.
+            let traits = presenter.viewIfLoaded?.window?.screen.traitCollection
+                ?? presenter.traitCollection
+            isDark = traits.userInterfaceStyle == .dark
         }
 
         guard let built = try? LinkURLBuilder.build(
