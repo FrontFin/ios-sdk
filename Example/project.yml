@@ -19,9 +19,12 @@ targets:
     dependencies:
       - package: MeshLink
         product: MeshLink
+    # DEVELOPMENT_TEAM comes from the untracked Config/Local.xcconfig.
+    configFiles:
+      Debug: Config/Signing.xcconfig
+      Release: Config/Signing.xcconfig
     settings:
       base:
-        DEVELOPMENT_TEAM: C6WMXUCWYF
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES

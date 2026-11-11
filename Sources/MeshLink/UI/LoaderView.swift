@@ -80,6 +80,9 @@ final class LoaderView: UIView {
         rotation.duration = 0.9
         rotation.repeatCount = .infinity
         rotation.timingFunction = CAMediaTimingFunction(name: .linear)
+        // Otherwise Core Animation drops it when the app goes to the background
+        // and the ring comes back frozen.
+        rotation.isRemovedOnCompletion = false
         arc.add(rotation, forKey: Self.rotationKey)
     }
 

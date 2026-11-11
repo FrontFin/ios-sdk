@@ -13,6 +13,13 @@ xcodegen generate
 open MeshLinkExample.xcodeproj
 ```
 
+To run on a device, set your Apple team in an untracked `Config/Local.xcconfig`
+(simulator builds need no signing):
+
+```bash
+cp Config/Local.xcconfig.example Config/Local.xcconfig   # then set DEVELOPMENT_TEAM
+```
+
 Run it on a simulator or device, paste a **client ID** and a **session token**
 (mint the token on your backend — the client secret must never be in the app),
 pick an environment, and tap **Open Link**.

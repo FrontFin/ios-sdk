@@ -1,0 +1,7 @@
+// Signing for running the example on a device. Simulator builds need nothing.
+//
+// Put your Apple team in an untracked Local.xcconfig next to this file:
+//   cp Local.xcconfig.example Local.xcconfig
+// then set DEVELOPMENT_TEAM there. The include is optional, so the project
+// still builds without it.
+#include? "Local.xcconfig"
