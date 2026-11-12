@@ -1,18 +1,12 @@
-import Foundation
 import Testing
 
-import MeshLink
+@testable import MeshLink
 
+/// CI already asserts that `VERSION` and `Version.swift` agree; this only checks
+/// that the public value is wired to it.
 @Suite("MeshLinkSDK")
 struct SDKVersionTests {
-    @Test func publicVersionMatchesTheVersionFile() throws {
-        let versionFile = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent() // MeshLinkTests
-            .deletingLastPathComponent() // Tests
-            .deletingLastPathComponent() // package root
-            .appendingPathComponent("VERSION")
-        let expected = try String(contentsOf: versionFile, encoding: .utf8)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        #expect(MeshLinkSDK.version == expected)
+    @Test func publicVersionIsTheSDKVersion() {
+        #expect(MeshLinkSDK.version == SDKVersion.current)
     }
 }
