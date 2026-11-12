@@ -8,5 +8,11 @@
 // other.
 
 enum SDKVersion {
-    static let current = "0.1.0"
+    static let current = "1.0.0"
+}
+
+/// Information about the MeshLink SDK itself.
+public enum MeshLinkSDK {
+    /// The SDK version (`MAJOR.MINOR.PATCH`). Include it in bug reports and logs.
+    public static let version = SDKVersion.current
 }

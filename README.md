@@ -26,7 +26,7 @@ https://github.com/FrontFin/ios-sdk
 or in a `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/FrontFin/ios-sdk.git", from: "0.1.0")
+.package(url: "https://github.com/FrontFin/ios-sdk.git", from: "1.0.0")
 ```
 
 then add `MeshLink` to your target's dependencies.
@@ -147,6 +147,11 @@ default:
 Wallet deep links and external pages (OAuth, on-ramps) open in the wallet app or
 the browser. Configure your app's own deep link / universal link so users can
 return to it afterwards.
+
+## SDK version
+
+`MeshLinkSDK.version` is the SDK's version string (e.g. `"1.0.0"`). Include it
+when you report an issue.
 
 ## Example app
 

@@ -31,8 +31,8 @@ public final class LinkSession {
     private let token: String
     private let clientId: String
     private let options: LinkOptions
-    private let onExit: (LinkExitSummary) -> Void
-    private let onError: (LinkError) -> Void
+    private let onExit: @MainActor (LinkExitSummary) -> Void
+    private let onError: @MainActor (LinkError) -> Void
 
     private weak var controller: LinkViewController?
     private var finished = false
@@ -51,8 +51,8 @@ public final class LinkSession {
         token: String,
         clientId: String,
         options: LinkOptions = LinkOptions(),
-        onExit: @escaping (LinkExitSummary) -> Void,
-        onError: @escaping (LinkError) -> Void
+        onExit: @escaping @MainActor (LinkExitSummary) -> Void,
+        onError: @escaping @MainActor (LinkError) -> Void
     ) {
         self.token = token
         self.clientId = clientId
