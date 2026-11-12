@@ -23,8 +23,8 @@ public extension View {
         token: String,
         clientId: String,
         options: LinkOptions = LinkOptions(),
-        onExit: @escaping (LinkExitSummary) -> Void,
-        onError: @escaping (LinkError) -> Void
+        onExit: @escaping @MainActor (LinkExitSummary) -> Void,
+        onError: @escaping @MainActor (LinkError) -> Void
     ) -> some View {
         background(
             MeshLinkPresenter(
@@ -46,8 +46,8 @@ private struct MeshLinkPresenter: UIViewControllerRepresentable {
     let token: String
     let clientId: String
     let options: LinkOptions
-    let onExit: (LinkExitSummary) -> Void
-    let onError: (LinkError) -> Void
+    let onExit: @MainActor (LinkExitSummary) -> Void
+    let onError: @MainActor (LinkError) -> Void
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
