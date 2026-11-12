@@ -69,13 +69,19 @@ enum LinkURLBuilder {
     /// `light` or `dark`; `system` follows the device appearance (light when the
     /// device is not in dark mode).
     static func resolveTheme(_ theme: LinkTheme, isDarkAppearance: Bool) -> String {
+        resolvesDark(theme, isDarkAppearance: isDarkAppearance) ? "dark" : "light"
+    }
+
+    /// Whether `theme` opens Link dark; the single theme mapping shared by the
+    /// URL (`th`) and the native chrome.
+    static func resolvesDark(_ theme: LinkTheme, isDarkAppearance: Bool) -> Bool {
         switch theme {
         case .light:
-            return "light"
+            return false
         case .dark:
-            return "dark"
+            return true
         case .system:
-            return isDarkAppearance ? "dark" : "light"
+            return isDarkAppearance
         }
     }
 

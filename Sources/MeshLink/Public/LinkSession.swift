@@ -82,42 +82,21 @@ public final class LinkSession {
             return
         }
 
-        let isDark: Bool
-        switch options.theme ?? .system {
-        case .dark:
-            isDark = true
-        case .light:
-            isDark = false
-        case .system:
-            isDark = presenter.traitCollection.userInterfaceStyle == .dark
-        }
-
-        guard let built = try? LinkURLBuilder.build(
-            token: trimmedToken,
-            clientId: trimmedClientId,
-            options: options,
-            isDarkAppearance: isDark
-        ) else {
-            // Unreachable: the blanks are handled above.
-            deliver(.error(LinkError(code: .loadError, message: "The Link URL could not be built.")))
-            return
-        }
-
         // Present over whatever is already on screen; presenting straight from
         // `presenter` would be a silent no-op if it is already presenting.
         let target = presenter.topmostPresenter()
         // A presenter that isn't in a window can't present. Without this, `present`
         // is a no-op, UIKit never retains the controller (``controller`` is weak),
         // and neither callback would ever fire — so report it instead.
-        guard target.viewIfLoaded?.window != nil else {
+        guard let window = target.viewIfLoaded?.window else {
             deliver(.error(LinkError(code: .loadError, message: "Link could not be presented.")))
             return
         }
 
-        // Captured strongly on purpose: the presented controller keeps the session
-        // alive, so an integrator need not store it. No cycle — `controller` is weak.
-        let controller = LinkViewController(built: built, isDark: isDark) { outcome in
-            self.deliver(outcome)
+        guard let controller = makeController(token: trimmedToken, clientId: trimmedClientId, in: window) else {
+            // Unreachable: the blanks are handled above.
+            deliver(.error(LinkError(code: .loadError, message: "The Link URL could not be built.")))
+            return
         }
         controller.modalPresentationStyle = .fullScreen
         controller.modalPresentationCapturesStatusBarAppearance = true
@@ -167,6 +146,35 @@ public final class LinkSession {
         case let .error(error):
             onError(error)
         }
+    }
+
+    /// Builds Link's controller with the theme resolved against `window`'s
+    /// device appearance. Nil only if the URL can't be built.
+    func makeController(token: String, clientId: String, in window: UIWindow) -> LinkViewController? {
+        let deviceIsDark = Self.deviceIsDark(in: window)
+        guard let built = try? LinkURLBuilder.build(
+            token: token,
+            clientId: clientId,
+            options: options,
+            isDarkAppearance: deviceIsDark
+        ) else {
+            return nil
+        }
+        let isDark = LinkURLBuilder.resolvesDark(options.theme ?? .system, isDarkAppearance: deviceIsDark)
+        // Captured strongly on purpose: the presented controller keeps the session
+        // alive, so an integrator need not store it. No cycle — `controller` is weak.
+        return LinkViewController(built: built, isDark: isDark) { outcome in
+            self.deliver(outcome)
+        }
+    }
+
+    /// The device appearance, not the host app's: a host override — UIKit's
+    /// `overrideUserInterfaceStyle` or SwiftUI's `.preferredColorScheme`, which
+    /// lands on the window scene — flows into the presenter's, window's and
+    /// scene's traits, so only the screen's traits still report the device
+    /// setting.
+    static func deviceIsDark(in window: UIWindow) -> Bool {
+        window.screen.traitCollection.userInterfaceStyle == .dark
     }
 }
 #endif

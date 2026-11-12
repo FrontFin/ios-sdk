@@ -15,8 +15,8 @@ enum LinkOutcome {
 final class LinkViewController: UIViewController {
     private let scriptHandlerName = "jsMessageHandler"
 
-    private let built: LinkURLBuilder.Built
-    private let isDark: Bool
+    let built: LinkURLBuilder.Built
+    let isDark: Bool
     private let onOutcome: (LinkOutcome) -> Void
 
     private var webView: WKWebView?
@@ -37,6 +37,9 @@ final class LinkViewController: UIViewController {
         self.isDark = isDark
         self.onOutcome = onOutcome
         super.init(nibName: nil, bundle: nil)
+        // Keep system UI inside Link (keyboard, WebView controls) on the resolved
+        // theme rather than inheriting the host app's override.
+        overrideUserInterfaceStyle = isDark ? .dark : .light
     }
 
     @available(*, unavailable)
