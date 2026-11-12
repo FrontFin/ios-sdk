@@ -13,6 +13,6 @@ enum SDKVersion {
 
 /// Information about the MeshLink SDK itself.
 public enum MeshLinkSDK {
-    /// The SDK version, e.g. `"1.0.0"`. Include it in bug reports and logs.
+    /// The SDK version (`MAJOR.MINOR.PATCH`). Include it in bug reports and logs.
     public static let version = SDKVersion.current
 }
