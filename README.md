@@ -95,7 +95,7 @@ actor.
 | --- | --- | --- | --- |
 | `environment` | `.prod` / `.sbx` / `.dev` | `.prod` | Which Link deployment to open. |
 | `language` | `String?` | — | UI language, e.g. `"en"` (Link `lng`). |
-| `theme` | `.light` / `.dark` / `.system` | — | `.light` / `.dark` force that mode. `.system` or nil uses your portal styling, then the device appearance. |
+| `theme` | `.light` / `.dark` / `.system` | — | `system` follows the device appearance, even if your app forces light or dark (`overrideUserInterfaceStyle`, `.preferredColorScheme`); pass `.light` / `.dark` to match a forced app appearance. |
 | `integrationId` | `String?` | — | Pre-select a wallet or exchange. |
 | `displayFiatCurrency` | `String?` | — | ISO 4217 code, e.g. `"DKK"`. A hint; Link validates it. |
 

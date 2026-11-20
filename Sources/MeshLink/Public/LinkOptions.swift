@@ -7,8 +7,8 @@ public enum LinkEnvironment: String, Sendable, Equatable {
     case sbx
 }
 
-/// Link's colour theme. `.light` / `.dark` force that mode. `.system` or nil
-/// uses your portal styling, then the device appearance.
+/// Link's colour theme. `system` is resolved from the device appearance when
+/// Link opens; Link itself is always told `light` or `dark`.
 public enum LinkTheme: String, Sendable, Equatable {
     case light
     case dark
@@ -23,8 +23,7 @@ public struct LinkOptions: Sendable, Equatable {
     /// UI language as a locale code (e.g. `"es"`, `"pt-BR"`), passed to Link as
     /// `lng`.
     public var language: String?
-    /// `.light` / `.dark` force that mode. `.system` or nil uses your portal
-    /// styling, then the device appearance.
+    /// `system` is resolved from the device appearance when Link opens.
     public var theme: LinkTheme?
     /// Pre-select a wallet integration so Link opens straight to its connect
     /// step.
