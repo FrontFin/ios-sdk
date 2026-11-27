@@ -22,15 +22,11 @@ enum LinkURLBuilder {
         let origin: String
     }
 
-    /// - Parameters:
-    ///   - isDarkAppearance: the device appearance, used to resolve a `system`
-    ///     theme to `light`/`dark` at open time.
     /// - Throws: ``LinkURLBuildError`` when `token` or `clientId` is blank.
     static func build(
         token: String,
         clientId: String,
-        options: LinkOptions,
-        isDarkAppearance: Bool
+        options: LinkOptions
     ) throws -> Built {
         let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedToken.isEmpty else {
@@ -51,7 +47,8 @@ enum LinkURLBuilder {
             params.append(("lng", language))
         }
         if let theme = options.theme {
-            params.append(("th", resolveTheme(theme, isDarkAppearance: isDarkAppearance)))
+            // Pass the theme through unchanged, including .system: Link resolves "system" itself.
+            params.append(("th", theme.rawValue))
         }
         if let integrationId = options.integrationId {
             params.append(("integrationId", integrationId))
@@ -64,25 +61,6 @@ enum LinkURLBuilder {
         // `base` is one of the environment constants, so it always has an origin.
         let origin = URLOrigin.origin(of: href) ?? base
         return Built(href: href, origin: origin)
-    }
-
-    /// `light` or `dark`; `system` follows the device appearance (light when the
-    /// device is not in dark mode).
-    static func resolveTheme(_ theme: LinkTheme, isDarkAppearance: Bool) -> String {
-        resolvesDark(theme, isDarkAppearance: isDarkAppearance) ? "dark" : "light"
-    }
-
-    /// Whether `theme` opens Link dark; the single theme mapping shared by the
-    /// URL (`th`) and the native chrome.
-    static func resolvesDark(_ theme: LinkTheme, isDarkAppearance: Bool) -> Bool {
-        switch theme {
-        case .light:
-            return false
-        case .dark:
-            return true
-        case .system:
-            return isDarkAppearance
-        }
     }
 
     private static func appendQuery(to base: String, params: [(String, String)]) -> String {

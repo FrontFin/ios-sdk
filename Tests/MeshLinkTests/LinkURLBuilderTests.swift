@@ -48,13 +48,11 @@ struct LinkURLVectorTests {
 
     @Test(arguments: vectors)
     func matchesVector(_ vector: URLVector) throws {
-        let isDark = vector.input.colorScheme == "dark"
         let build = {
             try LinkURLBuilder.build(
                 token: vector.input.token,
                 clientId: vector.input.clientId,
-                options: vector.input.options.toOptions(),
-                isDarkAppearance: isDark
+                options: vector.input.options.toOptions()
             )
         }
         if vector.expectedError == true {
@@ -71,19 +69,19 @@ struct LinkURLVectorTests {
 @Suite("Link URL — builder")
 struct LinkURLBuilderTests {
     @Test func reportsOriginForEnvironment() throws {
-        let sbx = try LinkURLBuilder.build(token: "t", clientId: "c", options: LinkOptions(environment: .sbx), isDarkAppearance: false)
+        let sbx = try LinkURLBuilder.build(token: "t", clientId: "c", options: LinkOptions(environment: .sbx))
         #expect(sbx.origin == "https://link.sbx.meshpay.com")
     }
 
     @Test func rejectsBlankToken() {
         #expect(throws: LinkURLBuildError.blankToken) {
-            _ = try LinkURLBuilder.build(token: "  ", clientId: "c", options: LinkOptions(), isDarkAppearance: false)
+            _ = try LinkURLBuilder.build(token: "  ", clientId: "c", options: LinkOptions())
         }
     }
 
     @Test func rejectsBlankClientId() {
         #expect(throws: LinkURLBuildError.blankClientId) {
-            _ = try LinkURLBuilder.build(token: "t", clientId: "", options: LinkOptions(), isDarkAppearance: false)
+            _ = try LinkURLBuilder.build(token: "t", clientId: "", options: LinkOptions())
         }
     }
 
@@ -91,25 +89,20 @@ struct LinkURLBuilderTests {
         let built = try LinkURLBuilder.build(
             token: "a b!'()~*",
             clientId: "c&d=e",
-            options: LinkOptions(language: "pt-BR"),
-            isDarkAppearance: false
+            options: LinkOptions(language: "pt-BR")
         )
         #expect(built.href == "https://link.meshpay.com/?token=a+b%21%27%28%29%7E*&clientId=c%26d%3De&lng=pt-BR")
     }
 
-    @Test func resolvesTheme() {
-        #expect(LinkURLBuilder.resolveTheme(.light, isDarkAppearance: true) == "light")
-        #expect(LinkURLBuilder.resolveTheme(.dark, isDarkAppearance: false) == "dark")
-        #expect(LinkURLBuilder.resolveTheme(.system, isDarkAppearance: true) == "dark")
-        #expect(LinkURLBuilder.resolveTheme(.system, isDarkAppearance: false) == "light")
+    @Test(arguments: [LinkTheme.light, .dark, .system])
+    func passesThemeThroughAsIs(_ theme: LinkTheme) throws {
+        let built = try LinkURLBuilder.build(token: "t", clientId: "c", options: LinkOptions(theme: theme))
+        #expect(built.href == "https://link.meshpay.com/?token=t&clientId=c&th=\(theme.rawValue)")
     }
 
-    @Test func resolvesDarkForEveryThemeAndAppearance() {
-        for appearance in [false, true] {
-            #expect(LinkURLBuilder.resolvesDark(.light, isDarkAppearance: appearance) == false)
-            #expect(LinkURLBuilder.resolvesDark(.dark, isDarkAppearance: appearance) == true)
-            #expect(LinkURLBuilder.resolvesDark(.system, isDarkAppearance: appearance) == appearance)
-        }
+    @Test func omitsThemeWhenUnset() throws {
+        let built = try LinkURLBuilder.build(token: "t", clientId: "c", options: LinkOptions())
+        #expect(!built.href.contains("th="))
     }
 }
 

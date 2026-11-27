@@ -41,7 +41,7 @@
         "options": { "theme": "system" },
         "colorScheme": "dark"
       },
-      "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456&th=dark"
+      "expected": "https://link.meshpay.com/?token=tok_123&clientId=cid_456&th=system"
     },
     {
       "id": "U6",

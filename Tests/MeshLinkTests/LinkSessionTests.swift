@@ -51,20 +51,28 @@ struct LinkSessionTests {
     }
 
     @Test(arguments: [LinkTheme.system, nil])
-    func systemThemeFollowsDeviceNotHostOverride(_ theme: LinkTheme?) throws {
+    func systemThemeWithoutTokenThemeFollowsDeviceNotHostOverride(_ theme: LinkTheme?) throws {
         let (window, deviceIsDark) = overriddenWindow()
         #expect(window.traitCollection.userInterfaceStyle != window.screen.traitCollection.userInterfaceStyle)
 
         let session = LinkSession(token: "t", clientId: "c", options: LinkOptions(theme: theme), onExit: { _ in }, onError: { _ in })
         let controller = try #require(session.makeController(token: "t", clientId: "c", in: window))
 
-        // Both the native chrome and the URL follow the device.
+        // A token without a theme: the native UI follows the device, and the URL
+        // passes the theme through unchanged.
         #expect(controller.isDark == deviceIsDark)
-        let expectedTh = theme == nil ? nil : (deviceIsDark ? "th=dark" : "th=light")
-        #expect(controller.built.href.contains("th=") == (expectedTh != nil))
-        if let expectedTh {
-            #expect(controller.built.href.contains(expectedTh))
-        }
+        #expect(controller.built.href.contains("th=system") == (theme == .system))
+        #expect(controller.built.href.contains("th=") == (theme != nil))
+    }
+
+    @Test(arguments: [LinkTheme.system, nil], ["LINK_THEME_LIGHT", "LINK_THEME_DARK"])
+    func systemThemeTakesNativeThemeFromToken(_ theme: LinkTheme?, _ tokenTheme: String) throws {
+        let (window, _) = overriddenWindow()
+        let json = #"{"v":1,"c":"code","th":"\#(tokenTheme)"}"#
+        let token = Data(json.utf8).base64EncodedString()
+        let session = LinkSession(token: token, clientId: "c", options: LinkOptions(theme: theme), onExit: { _ in }, onError: { _ in })
+        let controller = try #require(session.makeController(token: token, clientId: "c", in: window))
+        #expect(controller.isDark == (tokenTheme == "LINK_THEME_DARK"))
     }
 
     @Test(arguments: [LinkTheme.light, .dark])

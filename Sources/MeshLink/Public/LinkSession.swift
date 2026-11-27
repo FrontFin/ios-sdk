@@ -148,19 +148,18 @@ public final class LinkSession {
         }
     }
 
-    /// Builds Link's controller with the theme resolved against `window`'s
-    /// device appearance. Nil only if the URL can't be built.
+    /// Builds Link's controller, with the native UI matching the theme Link will
+    /// show. Nil only if the URL can't be built.
     func makeController(token: String, clientId: String, in window: UIWindow) -> LinkViewController? {
         let deviceIsDark = Self.deviceIsDark(in: window)
         guard let built = try? LinkURLBuilder.build(
             token: token,
             clientId: clientId,
-            options: options,
-            isDarkAppearance: deviceIsDark
+            options: options
         ) else {
             return nil
         }
-        let isDark = LinkURLBuilder.resolvesDark(options.theme ?? .system, isDarkAppearance: deviceIsDark)
+        let isDark = LinkThemeResolver.isDark(theme: options.theme, token: token, isDarkAppearance: deviceIsDark)
         // Captured strongly on purpose: the presented controller keeps the session
         // alive, so an integrator need not store it. No cycle — `controller` is weak.
         return LinkViewController(built: built, isDark: isDark) { outcome in
